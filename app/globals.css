@@ -483,7 +483,7 @@ span[data-rehype-pretty-code-figure] code span span::after {
 
 .blog {
   h2 {
-    @apply w-fit font-bold bg-orange-light px-1.5 leading-3 dark:bg-blue-light;
+    @apply w-fit font-bold bg-orange-light px-1.5 dark:bg-blue-light;
 
     font-size: 1.5rem;
     margin-top: 2.5rem;
