@@ -24,6 +24,7 @@ export default function BlogPage() {
                 {blog.date}
               </time>
               <Image
+                unoptimized
                 width={250}
                 height={250}
                 src={blog.thumbnailUrl}
