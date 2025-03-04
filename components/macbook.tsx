@@ -12,6 +12,14 @@ export default function MacBook() {
             </div>
             <span className="sr-only">MacBook Air</span>
           </div>
+          <Image
+            unoptimized
+            width={100}
+            height={100}
+            alt="apple logo"
+            src="http://www.clker.com/cliparts/i/s/H/f/4/T/apple-logo-white.svg"
+            className="logo"
+          />
         </div>
         <div className="body">
           <div className="face-one">
