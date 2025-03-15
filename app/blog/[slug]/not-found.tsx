@@ -5,7 +5,9 @@ export default function NotFound() {
   return (
     <section className="w-full flex flex-col items-center justify-center text-center max-w-screen-md min-h-[calc(100vh-200px)]">
       <FrownIcon size={40} className="text-gray-400" />
-      <h2 className="text-xl font-semibold">404 Not Found</h2>
+      <h2 className="text-xl font-semibold font-mono tracking-tighter">
+        404 Not Found
+      </h2>
       <p>Could not find the blog post.</p>
       <Link
         href={'/blog'}
