@@ -61,7 +61,7 @@ export default function MentorshipPage() {
   };
 
   return (
-    <section className="flex flex-col gap-8">
+    <section className="flex flex-col gap-8 min-h-[calc(100vh-200px)]">
       <PageTitle
         title="🌱 Mentorship."
         description="Sharing knowledge, offering guidance, and making an impact—one mentorship at a time."
