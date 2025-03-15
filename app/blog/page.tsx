@@ -21,7 +21,11 @@ export default function BlogPage() {
               className="flex flex-col pt-3 pb-5 px-3 rounded-xl bg-black-lighter border border-black transition-all hover:scale-105 cursor-pointer hover:bg-blue-lighter dark:bg-gray-lighter dark:border-gray-light"
             >
               <time className="w-fit mb-3 ml-auto px-1 py-0.5 bg-blue-lighter text-gray text-xs dark:bg-orange-light dark:text-white">
-                {blog.date}
+                {new Intl.DateTimeFormat('en-US', {
+                  month: 'short',
+                  day: '2-digit',
+                  year: 'numeric',
+                }).format(new Date(blog.date))}
               </time>
               <Image
                 unoptimized
