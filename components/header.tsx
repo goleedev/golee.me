@@ -63,8 +63,8 @@ export default function Header() {
         <nav>
           <ul className="flex flex-col gap-2">
             <NavLink title="Home" href="/" />
-            {/* <NavLink title="About" href="/about" /> */}
             <NavLink title="Blog" href="/blog" />
+            <NavLink title="Mentorship" href="/mentorship" />
             {/* <NavLink title="Projects" href="/projects" /> */}
           </ul>
         </nav>
