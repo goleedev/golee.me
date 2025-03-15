@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import PageTitle from '@/components/page-title';
 import { getMentorshipData } from '@/utils/mentorship';
 import { FrownIcon } from 'lucide-react';
@@ -20,6 +20,8 @@ export default function MentorshipPage() {
   const [expandedEntries, setExpandedEntries] = useState<Set<number>>(
     new Set()
   );
+  const [isMobile, setIsMobile] = useState<boolean>(false); // ✅ 모바일 체크
+  const feedbackRefs = useRef<(HTMLParagraphElement | null)[]>([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -33,6 +35,17 @@ export default function MentorshipPage() {
       }
     }
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
   const toggleExpand = (index: number) => {
@@ -65,7 +78,11 @@ export default function MentorshipPage() {
             )
             .map((entry, index) => {
               const isExpanded = expandedEntries.has(index);
-              const shouldShowReadMore = entry.feedback.length > 100;
+
+              const shouldShowReadMore =
+                !isMobile &&
+                (feedbackRefs.current[index]?.scrollHeight || 0) >
+                  (feedbackRefs.current[index]?.clientHeight || 0);
 
               return (
                 <div
@@ -89,8 +106,9 @@ export default function MentorshipPage() {
                       {entry.name}
                     </p>
                     <p
+                      ref={(el) => (feedbackRefs.current[index] = el)}
                       className={`pt-1 text-sm tracking-tight ${
-                        isExpanded ? '' : 'line-clamp-1 sm:line-clamp-3'
+                        isExpanded ? '' : 'sm:line-clamp-3'
                       }`}
                     >
                       {entry.feedback}
