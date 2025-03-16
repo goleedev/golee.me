@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import PageTitle from '@/components/page-title';
 import { getMentorshipData } from '@/utils/mentorship';
-import { FrownIcon } from 'lucide-react';
+import { FrownIcon, Linkedin, Github } from 'lucide-react';
 
 type MentorshipEntry = {
   timestamp: string;
@@ -102,6 +102,28 @@ export default function MentorshipPage() {
                       >
                         {isExpanded ? 'Read Less' : 'Read More'}
                       </button>
+                    )}
+                  </div>
+                  <div className="absolute bottom-3 right-3 flex gap-3">
+                    {entry.linkedin && (
+                      <a
+                        href={entry.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-black"
+                      >
+                        <Linkedin size={20} />
+                      </a>
+                    )}
+                    {entry.github && (
+                      <a
+                        href={entry.github}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-black"
+                      >
+                        <Github size={20} />
+                      </a>
                     )}
                   </div>
                 </div>
