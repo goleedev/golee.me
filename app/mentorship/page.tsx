@@ -20,6 +20,7 @@ export default function MentorshipPage() {
   const [expandedEntries, setExpandedEntries] = useState<Set<number>>(
     new Set()
   );
+  const [isMobile, setIsMobile] = useState<boolean>(false);
 
   useEffect(() => {
     async function fetchData() {
@@ -33,6 +34,17 @@ export default function MentorshipPage() {
       }
     }
     fetchData();
+  }, []);
+
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+
+    return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
   const toggleExpand = (index: number) => {
@@ -65,7 +77,9 @@ export default function MentorshipPage() {
             )
             .map((entry, index) => {
               const isExpanded = expandedEntries.has(index);
-              const shouldShowReadMore = entry.feedback.length > 163;
+
+              const shouldShowReadMore =
+                !isMobile && entry.feedback.length > 163;
 
               return (
                 <div
