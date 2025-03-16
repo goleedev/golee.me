@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import PageTitle from '@/components/page-title';
 import { getMentorshipData } from '@/utils/mentorship';
 import { FrownIcon } from 'lucide-react';
@@ -20,8 +20,6 @@ export default function MentorshipPage() {
   const [expandedEntries, setExpandedEntries] = useState<Set<number>>(
     new Set()
   );
-  const [isMobile, setIsMobile] = useState<boolean>(false); // ✅ 모바일 체크
-  const feedbackRefs = useRef<(HTMLParagraphElement | null)[]>([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -35,17 +33,6 @@ export default function MentorshipPage() {
       }
     }
     fetchData();
-  }, []);
-
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsMobile(window.innerWidth < 640);
-    };
-
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-
-    return () => window.removeEventListener('resize', checkScreenSize);
   }, []);
 
   const toggleExpand = (index: number) => {
@@ -78,16 +65,12 @@ export default function MentorshipPage() {
             )
             .map((entry, index) => {
               const isExpanded = expandedEntries.has(index);
-
-              const shouldShowReadMore =
-                !isMobile &&
-                (feedbackRefs.current[index]?.scrollHeight || 0) >
-                  (feedbackRefs.current[index]?.clientHeight || 0);
+              const shouldShowReadMore = entry.feedback.length > 163;
 
               return (
                 <div
                   key={index}
-                  className="flex relative flex-col px-3 pt-2 pb-5 rounded-xl bg-black-lighter border border-black transition-all hover:scale-105 cursor-default hover:bg-blue-lighter dark:bg-gray-lighter dark:border-gray-light"
+                  className="flex relative flex-col px-3 pt-2 pb-5 rounded-xl bg-black-lighter border border-black cursor-default dark:bg-gray-lighter dark:border-gray-light"
                 >
                   <div className="flex justify-between">
                     <p className="text-sm text-orange font-semibold font-mono dark:text-blue">
@@ -106,7 +89,6 @@ export default function MentorshipPage() {
                       {entry.name}
                     </p>
                     <p
-                      ref={(el) => (feedbackRefs.current[index] = el)}
                       className={`pt-1 text-sm tracking-tight ${
                         isExpanded ? '' : 'sm:line-clamp-3'
                       }`}
@@ -138,7 +120,7 @@ export default function MentorshipPage() {
       <button
         type="button"
         disabled
-        className="w-fit mx-auto disabled:cursor-not-allowed disabled:opacity-60 rounded-md bg-blue-500 px-4 py-2 text-sm text-white transition-colors bg-orange hover:bg-orange-light dark:bg-blue dark:hover:bg-blue-light"
+        className="w-fit mx-auto disabled:cursor-not-allowed disabled:opacity-60 rounded-md bg-orange px-4 py-2 text-sm text-white transition-colors"
       >
         Mentorship on Pause
       </button>
@@ -152,7 +134,7 @@ function LoadingSkeleton() {
       {[...Array(4)].map((_, index) => (
         <div
           key={index}
-          className="animate-pulse h-[140px] flex relative flex-col pt-3 pb-5 px-3 rounded-xl bg-gray-light border border-gray-light transition-all cursor-default dark:bg-gray dark:border-gray"
+          className="animate-pulse h-[140px] flex relative flex-col pt-3 pb-5 px-3 rounded-xl bg-gray-light border border-gray-light cursor-default dark:bg-gray dark:border-gray"
         >
           <div className="h-6 bg-gray-lighter rounded w-1/3 mb-2"></div>
           <div className="h-4 bg-gray-lighter rounded w-1/2 mb-4"></div>
