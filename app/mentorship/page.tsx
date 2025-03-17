@@ -124,7 +124,7 @@ export default function MentorshipPage() {
                         href={entry.linkedin}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-black"
+                        className="text-black dark:text-white"
                       >
                         <Linkedin size={20} />
                       </a>
@@ -134,7 +134,7 @@ export default function MentorshipPage() {
                         href={entry.github}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-black"
+                        className="text-black dark:text-white"
                       >
                         <Github size={20} />
                       </a>
