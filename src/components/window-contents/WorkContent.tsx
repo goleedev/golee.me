@@ -1,12 +1,9 @@
-import { ExternalLink } from 'lucide-react';
-
 export const WorkContent = () => {
   const experiences = [
     {
       id: 'cloudflare',
       company: 'Cloudflare',
       role: 'Systems Engineer (Frontend)',
-      team: 'Zero Trust Team',
       location: 'London, UK',
       period: 'December 2024 - Present',
       type: 'Full-time',
@@ -22,9 +19,8 @@ export const WorkContent = () => {
     },
     {
       id: 'uncutgems',
-      company: 'Uncutgems Company',
+      company: 'Uncutgems',
       role: 'Frontend Engineer',
-      team: 'E-commerce Platform (Fabrill)',
       location: 'Seoul, South Korea',
       period: 'June 2023 - September 2024',
       type: 'Full-time',
@@ -49,7 +45,6 @@ export const WorkContent = () => {
       id: 'hypercloud',
       company: 'Hyper Cloud',
       role: 'Frontend Developer',
-      team: 'AR Content Creation SaaS',
       location: 'Seoul, South Korea',
       period: 'February 2022 - June 2023',
       type: 'Full-time',
@@ -72,7 +67,6 @@ export const WorkContent = () => {
       id: 'medibloc',
       company: 'MediBloc',
       role: 'Frontend Engineer',
-      team: 'Cloud EMR Dr. Palette',
       location: 'Seoul, South Korea',
       period: 'February 2021 - May 2021',
       type: 'Internship',
@@ -119,27 +113,27 @@ export const WorkContent = () => {
               {/* Content */}
               <div className="ml-8">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
-                  <div>
-                    <h3 className="text-xl font-medium text-gray-900">
-                      {exp.role}
-                    </h3>
-                    <div className="flex items-center space-x-2 text-gray-600 mt-0.5">
-                      <span className="font-medium">{exp.company}</span>
-                      <span>•</span>
-                      <span className="text-sm">{exp.team}</span>
-                    </div>
-                    <div className="flex items-center space-x-2 text-sm text-gray-500 mt-0.5">
-                      <span>{exp.location}</span>
-                      <span>•</span>
-                      <span>{exp.period}</span>
-                      <span>•</span>
-                      <span>{exp.type}</span>
+                <div className="flex justify-between items-start">
+                  <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
+                    <div>
+                      <h3 className="text-xl font-medium text-gray-900">
+                        {exp.role}
+                      </h3>
+                      <div className="flex items-center space-x-2 text-gray-600 mt-0.5">
+                        <span className="font-medium">{exp.company}</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm text-gray-500 mt-0.5">
+                        <span>{exp.location}</span>
+                        <span>•</span>
+                        <span>{exp.period}</span>
+                        <span>•</span>
+                        <span>{exp.type}</span>
+                      </div>
                     </div>
                   </div>
                   {index === 0 && (
                     <div className="mt-2 md:mt-0">
-                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-green-100 text-green-700">
+                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-black/80 text-white">
                         Current
                       </span>
                     </div>
@@ -214,33 +208,6 @@ export const WorkContent = () => {
                 Components Built
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Links */}
-        <div className="border-t border-gray-200 pt-8 mt-8">
-          <h3 className="font-medium text-gray-900 mb-4">
-            Professional Profiles
-          </h3>
-          <div className="flex space-x-4">
-            <a
-              href="https://linkedin.com/in/goleedev"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <span>LinkedIn</span>
-              <ExternalLink size={12} />
-            </a>
-            <a
-              href="https://github.com/goleedev"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center space-x-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              <span>GitHub</span>
-              <ExternalLink size={12} />
-            </a>
           </div>
         </div>
       </div>

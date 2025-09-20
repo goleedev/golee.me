@@ -5,9 +5,7 @@ export const WorkContent = () => (
       <div className="space-y-6">
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-100 shadow-sm">
           <h4 className="font-medium text-gray-900 mb-2">Frontend Engineer</h4>
-          <p className="text-gray-600 text-sm mb-3">
-            Cloudflare, Zero Trust Team
-          </p>
+          <p className="text-gray-600 text-sm mb-3">Cloudflare</p>
           <p className="text-gray-700 font-light leading-relaxed">
             Building secure web applications and improving user experience for
             Zero Trust products.

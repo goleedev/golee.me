@@ -83,9 +83,9 @@ export const AboutContent = () => {
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-100 shadow-sm mb-6">
           <p className="text-gray-700 leading-relaxed font-light mb-4">
             Driven frontend engineer with 4+ years of experience building
-            impactful web applications. Currently working at Cloudflare on the
-            Zero Trust team, focusing on user experience improvements and secure
-            dashboard solutions.
+            impactful web applications. Currently working at Cloudflare,
+            focusing on user experience improvements and secure dashboard
+            solutions.
           </p>
           <p className="text-gray-700 leading-relaxed font-light">
             Co-founder of DefyDefault (formerly XXIT), a pioneering Women in

@@ -7,7 +7,13 @@ import MusicIcon from './components/MusicIcon';
 import NoteIcon from './components/NoteIcon';
 import Stickies from './components/Stickies';
 import Window from './components/Window';
-import { CommunityContent, SpeakingContent } from './components/WindowContent';
+import { AboutContent } from './components/window-contents/AboutContent';
+import { CommunityContent } from './components/window-contents/CommunityContent';
+import { GuestbookContent } from './components/window-contents/GuestbookContent';
+import { MentorshipContent } from './components/window-contents/MentorshipContent';
+import { MusicContent } from './components/window-contents/MusicContent';
+import { WorkContent } from './components/window-contents/WorkContent';
+import { SpeakingContent } from './components/WindowContent';
 import type {
   DockItem,
   DragState,
@@ -19,11 +25,6 @@ import type {
   Track,
   WindowState,
 } from './types';
-import { MusicContent } from './components/window-contents/MusicContent';
-import { AboutContent } from './components/window-contents/AboutContent';
-import { WorkContent } from './components/window-contents/WorkContent';
-import { MentorshipContent } from './components/window-contents/MentorshipContent';
-import { GuestbookContent } from './components/window-contents/GuestbookContent';
 
 const MacOSPortfolio = () => {
   const [windows, setWindows] = useState<WindowState[]>([]);
@@ -132,7 +133,7 @@ const MacOSPortfolio = () => {
     },
     {
       id: 'work',
-      icon: <FolderIcon />,
+      icon: <NoteIcon />,
       title: 'Work',
       isActive: false,
       bounceCount: 0,
@@ -150,7 +151,7 @@ const MacOSPortfolio = () => {
     },
     {
       id: 'mentorship',
-      icon: <FolderIcon />,
+      icon: <NoteIcon />,
       title: 'Mentorship',
       isActive: false,
       bounceCount: 0,
