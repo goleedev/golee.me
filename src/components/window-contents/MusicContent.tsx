@@ -83,7 +83,7 @@ export const MusicContent: React.FC<MusicContentProps> = ({
 }) => {
   const playerRef = useRef<YouTubePlayer | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<number | null>(null); // Changed from NodeJS.Timeout to number
   const progressBarRef = useRef<HTMLDivElement>(null);
   const windowRef = useRef<HTMLDivElement>(null);
 
@@ -280,7 +280,8 @@ export const MusicContent: React.FC<MusicContentProps> = ({
   const startTimeUpdate = useCallback((): void => {
     if (intervalRef.current) return;
 
-    intervalRef.current = setInterval(() => {
+    intervalRef.current = window.setInterval(() => {
+      // Changed to window.setInterval
       if (playerRef.current && !isDraggingProgress) {
         try {
           const current = playerRef.current.getCurrentTime();
@@ -298,7 +299,7 @@ export const MusicContent: React.FC<MusicContentProps> = ({
 
   const stopTimeUpdate = useCallback((): void => {
     if (intervalRef.current) {
-      clearInterval(intervalRef.current);
+      window.clearInterval(intervalRef.current); // Changed to window.clearInterval
       intervalRef.current = null;
     }
   }, []);
