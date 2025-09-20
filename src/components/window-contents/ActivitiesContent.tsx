@@ -232,12 +232,12 @@ export const ActivitiesContent = () => {
                     {categoryActivities.map((activity) => (
                       <div key={activity.id}>
                         <div className="flex flex-col space-y-1 mb-2">
-                          <div className="flex items-center space-x-2">
+                          <div className="flex items-start justify-between space-x-2">
                             <span className="font-medium text-gray-900 border-l-2 border-gray-400 pl-4 mb-2">
                               {activity.title}
                             </span>
                             {activity.featured && (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-black/80 text-white">
+                              <span className="px-2 py-0.5 rounded text-xs font-medium bg-black/80 text-white">
                                 Featured
                               </span>
                             )}

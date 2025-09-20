@@ -127,7 +127,7 @@ export const CommunityContent = () => {
             Community Journey
           </h2>
           <p className="text-gray-600 font-light">
-            Building and empowering women in tech communities since 2019
+            Building and empowering the women in tech community since 2019
           </p>
         </div>
 
