@@ -21,6 +21,7 @@ export type WindowState = {
   size: Size;
   originalPosition?: Position;
   originalSize?: Size;
+  wasAutoMaximized?: boolean;
 };
 
 export type Track = {
@@ -56,10 +57,14 @@ export interface IconDragState {
   startIconPos: Position;
 }
 
+// 이 부분이 변경됨
 export type StickyState = {
   id: string;
+  type: 'analytics' | 'privacy';
   position: Position;
   zIndex: number;
+  isExpanded?: boolean;
+  originalPosition?: Position;
 };
 
 export interface StickyDragState {
@@ -67,4 +72,13 @@ export interface StickyDragState {
   stickyId: string | null;
   startPos: Position;
   startStickyPos: Position;
+}
+
+export interface BlogPost {
+  slug: string;
+  title: string;
+  date: string;
+  description: string;
+  thumbnailUrl: string;
+  readTime?: string;
 }

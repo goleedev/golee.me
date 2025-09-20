@@ -1,0 +1,138 @@
+---
+title: Unpopular Opinion — Everyone Needs Animations
+date: 2024-03-27
+description: Learn how to integrate lightweight animations into your Next.js applications using Lottie.
+thumbnailUrl: /thumbnails/lottie.gif
+---
+
+> Unpopular opinion: everyone needs animations.
+
+![Lottie Animation](/posts/lottie-with-nextjs/unpopular-opinion.jpeg)
+
+As a frontend engineer, I firmly believe in the power of animation to enhance user experience. When used thoughtfully, animations can transform ordinary interactions into delightful experiences, leaving a lasting impression on users. Today, I want to share how you can `implement lightweight animations in a Next.js application` using the popular animation library, Lottie.
+
+---
+
+## What is Lottie?
+
+![Lottie Animation](/posts/lottie-with-nextjs/lottie-animation.gif)
+
+Lottie, developed by Airbnb, is a powerful animation library that allows frontend developers to `seamlessly integrate high-quality animations` into their web and mobile applications. It simplifies the process of adding animations by enabling the use of`JSON-based animation files`.
+
+> According to its [official website](https://lottiefiles.com/), Lottie is "a JSON-based animation file format that allows you to ship animations on any platform as easily as shipping static assets".
+
+Lottie animations are much smaller and infinitely scalable because they are based on vectors. As a frontend developer, there is absolutely no reason not to use Lottie, especially since `using GIFs for animations can be cumbersome due to their size and loading speed`.
+
+With Lottie, you can effortlessly enhance your user interfaces with captivating animations, making your applications more engaging and visually appealing.
+
+---
+
+## Lottie in Next.js
+
+![Lottie Animation Example](/posts/lottie-with-nextjs/sparkle-animation.gif)
+
+Integrating Lottie into your Next.js project is straightforward, especially when paired with TypeScript for type safety and Tailwind for rapid UI development. Let's dive into the steps to get you up and running.
+
+### How to Install
+
+Begin by installing the necessary dependency, lottie-react. With pnpm, npm, or yarn, simply run:
+
+```bash
+pnpm add lottie-react
+or
+npm i lottie-react
+or
+yarn add lottie-react
+```
+
+### How to integrate
+
+To use Lottie in Next.js, simply import it and pass an animation JSON as props to the Lottie component. Here’s an example for the above attached animation.
+
+```ts
+import Lottie from 'lottie-react';
+import animation from '@/public/wish-animation.json';
+
+export default function WishButton() {
+  return (
+    <Lottie animationData={animation} loop={false} className="w-10 h-10 />
+  )
+}
+```
+
+---
+
+## How to Get Animation Data
+
+From the above example code, you may wonder how to get a JSON file for `animationData`. This can be done in a few ways.
+
+### Lottie Free Animation
+
+![Lottie Animation](/posts/lottie-with-nextjs/1.png)
+![Lottie Animation](/posts/lottie-with-nextjs/2.png)
+
+Lottie offers a vast collection of pre-made animations through its [free animation section](https://lottiefiles.com/featured). After browsing, you can download animations of your choice.
+
+### Adobe After Effects
+
+If you are familiar with Adobe After Effects and seeking a unique touch, you can create your animations using [Adobe After Effects](https://lottiefiles.com/plugins/after-effects).
+After creating animations, you can export them as Lottie JSON file using the `LottieFiles plugin` or the `Bodymovin extension`.
+
+### Figma (Recommended)
+
+Figma is a versatile tool for various designs, and you can create Lottie JSON code using the [dev mode plugin](https://lottiefiles.com/plugins/figma). From my experience, `this method is the easiest way to obtain animation data`.
+
+---
+
+## Lottie Alternatives
+
+While Lottie is a powerful tool for adding animations to web applications, there are other options to consider depending on your specific needs. Here are a few alternatives:
+
+### Rive
+
+- Similar to Lottie, Rive allows you to create and export animation data in `JSON format`.
+- Provides `additional features like state machines and triggers` for more complex animations.
+- May be a good choice if you need `more interactivity or control` over your animations.
+
+### Framer Motion
+
+- Primarily focused on `React development`.
+- Offers a `declarative approach to animation`, making it easier to define animation states and transitions within your React components.
+- Consider Framer Motion if you're already using React and want a tightly integrated animation solution.
+
+### Anime.js:
+
+- A `JavaScript animation library` offering a high degree of flexibility and control.
+- `Requires more code` compared to Lottie or Framer Motion.
+- A good option if you need fine-grained control over your animations or `want to avoid external dependencies`.
+
+### CSS Animations
+
+- Offer a lightweight and performant way to add `basic animations` to your web pages.
+- Limited compared to dedicated animation libraries but `can be sufficient for simple animations`.
+- Consider CSS animations if you only need basic animations and want to minimize external dependencies.
+
+### Choosing the Right Tool:
+
+The best animation solution for your project depends on several factors, including:
+
+- Your familiarity with different animation tools and libraries.
+- The complexity of the animations you need to create.
+- The level of interactivity required for your animations.
+- Your preference for a declarative or imperative approach to animation.
+- Your project's existing technology stack (e.g., React, vanilla JavaScript).
+
+By considering these factors and exploring the alternatives mentioned above, you can choose the most suitable tool to add animations and enhance the user experience of your web application.
+
+---
+
+## Wrapping Up
+
+I hope that you found this post helpful.
+
+If some info is outdated or incorrect, or you have anything to add, say or ask, please contact me via [email](mailto:golee.dev@gmail.com).
+
+---
+
+- Reference
+  - [Lottie](https://lottiefiles.com/)
