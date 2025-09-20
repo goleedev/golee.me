@@ -1,0 +1,374 @@
+---
+title: Tracking GitHub Clone Stats Beyond the 14-Day Limit
+date: 2025-10-11
+description: Building an automated solution to permanently track repository clones using GitHub Actions, Gist, and Shields.io
+thumbnailUrl: /thumbnails/github-clone-tracker.png
+---
+
+While building my portfolio at [golee.me](https://golee.me), I wanted to track how many times people cloned my repository. Seems simple, right? **Not quite.**
+
+GitHub only shows clone statistics for the last 14 days. After that? Gone forever. Plus, the data is private—making it impossible to create a public badge to showcase on your README.
+
+So I did what any developer would do: I built my own solution. 🕺🏻
+
+---
+
+## The Problem
+
+GitHub's Traffic API has two major limitations:
+
+- **14-Day Retention:** Clone statistics are only available for the past 14 days. Historical data is permanently lost.
+- **Private Data:** Traffic data is only accessible to repository owners/admins and requires authentication, making it impossible to create public badges.
+
+For developers who want to:
+
+- Track long-term repository growth
+- Display clone metrics publicly on their README
+- Understand actual usage patterns over time
+
+These limitations are... frustrating. 😮‍💨
+
+---
+
+## The Solution
+
+![actions](/posts/github-clone-tracker/actions.png)
+
+I built an automated tracking system that:
+
+1. **Runs daily** via GitHub Actions with cron scheduling
+2. **Fetches clone data** from GitHub's API
+3. **Stores cumulative statistics** in a Gist
+4. **Displays live counts** via Shields.io badges
+5. **Prevents duplicate counting** with smart date tracking
+
+**Result:** Permanent clone tracking with zero manual maintenance. ✨
+
+---
+
+## How It Works
+
+### Architecture Overview
+
+The system consists of four main components:
+
+1. **GitHub Actions Workflow** - Automated daily execution
+2. **GitHub API** - Source of clone data
+3. **GitHub Gist** - Persistent data storage
+4. **Shields.io** - Badge generation and display
+
+### Data Flow
+
+GitHub Actions (Cron Job) ➡️
+
+Fetch clone data via GitHub API ➡️
+
+Calculate new clones (prevent duplicates) ➡️
+
+Update Gist with cumulative stats ➡️
+
+Shields.io reads Gist ➡️ README badge updates
+
+---
+
+## Implementation
+
+### Step 1: Create GitHub Personal Access Token
+
+First, you'll need a token with the right permissions:
+
+![tokens](/posts/github-clone-tracker/token.png)
+
+1. Go to **Settings → Developer settings → Personal access tokens → Tokens (classic)**
+2. Generate new token with these scopes:
+   - ✅ `repo` (full access to repositories)
+   - ✅ `gist` (create and modify gists)
+3. Save the token securely—you won't see it again!
+
+### Step 2: Create Gist Files
+
+Create a new Gist with **two files**:
+
+**File 1: `clone-data.json`** (Internal tracking)
+
+```json
+{
+  "total_clones": 0,
+  "recorded_dates": {}
+}
+```
+
+**File 2: `clone-stats.json`** (Shields.io badge format)
+
+```json
+{
+  "schemaVersion": 1,
+  "label": "total clones",
+  "message": "0",
+  "color": "black"
+}
+```
+
+Note your Gist ID from the URL: https://gist.github.com/username/GIST_ID
+
+### Step 3: Configure Repository Secrets
+
+In your repository:
+
+1. Go to **Settings → Secrets and variables → Actions**
+2. Add these secrets:
+
+- GIST_TOKEN - Your personal access token
+- GIST_ID - Your Gist ID from above
+
+### Step 4: Create GitHub Actions Workflow
+
+Create `.github/workflows/track-clones.yml`:
+
+```yaml
+name: Track Clone Statistics (Cumulative)
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Daily at midnight UTC
+  workflow_dispatch: # Allow manual runs
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get clone data from GitHub
+        id: clones
+        env:
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+        run: |
+          echo "📊 Fetching clone data..."
+
+          response=$(curl -s -H "Authorization: Bearer $GIST_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/traffic/clones")
+
+          echo "=== API Response ==="
+          echo "$response" | jq '.'
+          echo "==================="
+
+          clones_data=$(echo "$response" | jq -c '.clones // []')
+          echo "clones_data=$clones_data" >> $GITHUB_OUTPUT
+
+      - name: Update cumulative stats
+        env:
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          GIST_ID: ${{ secrets.GIST_ID }}
+        run: |
+          echo "🔄 Updating cumulative statistics..."
+
+          # Fetch current tracking data
+          current_gist=$(curl -s -H "Authorization: Bearer $GIST_TOKEN" \
+            "https://api.github.com/gists/$GIST_ID")
+
+          tracking_data=$(echo "$current_gist" | jq -r '.files["clone-data.json"].content // "{\"total_clones\": 0, \"recorded_dates\": {}}"')
+
+          clones_data='${{ steps.clones.outputs.clones_data }}'
+
+          # Calculate cumulative stats (prevent duplicate counting)
+          updated_tracking=$(echo "$tracking_data" | jq --argjson new_clones "$clones_data" '
+            .recorded_dates //= {} |
+            .total_clones //= 0 |
+            
+            (
+              $new_clones | map({
+                date: (.timestamp | split("T")[0]),
+                count: .count
+              })
+            ) as $daily_data |
+            
+            reduce $daily_data[] as $day (
+              .;
+              if (.recorded_dates[$day.date] // 0) == 0 then
+                .recorded_dates[$day.date] = $day.count |
+                .total_clones += $day.count
+              else
+                (($day.count - (.recorded_dates[$day.date] // 0)) as $diff |
+                  if $diff > 0 then
+                    .recorded_dates[$day.date] = $day.count |
+                    .total_clones += $diff
+                  else .
+                  end
+                )
+              end
+            )
+          ')
+
+          total=$(echo "$updated_tracking" | jq -r '.total_clones')
+          echo "✅ Total cumulative clones: $total"
+
+          # Create Shields.io badge JSON (only 4 required properties)
+          badge_json=$(jq -n \
+            --arg total "$total" \
+            '{
+              schemaVersion: 1,
+              label: "total clones",
+              message: $total,
+              color: "black"
+            }')
+
+          # Update both files in Gist
+          curl -s -X PATCH \
+            -H "Authorization: Bearer $GIST_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/gists/$GIST_ID" \
+            -d "{
+              \"files\": {
+                \"clone-data.json\": {
+                  \"content\": $(echo "$updated_tracking" | jq -Rs .)
+                },
+                \"clone-stats.json\": {
+                  \"content\": $(echo "$badge_json" | jq -Rs .)
+                }
+              }
+            }"
+
+          echo "🎉 Gist updated! Total clones: $total"
+```
+
+### Step 5: Add Badge to README
+
+Add this to your `README.md`:
+
+```md
+![Total Clones](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/YOUR_USERNAME/YOUR_GIST_ID/raw/clone-stats.json)
+![GitHub Stars](https://img.shields.io/github/stars/YOUR_USERNAME/YOUR_REPO?style=flat-square&color=yellow)
+```
+
+Replace **YOUR_USERNAME, YOUR_GIST_ID, and YOUR_REPO** with your actual values.
+
+---
+
+## Key Features
+
+### Duplicate Prevention
+
+The system intelligently handles multiple runs per day:
+
+**Scenario**: You manually run the workflow at 3 PM, then it auto-runs at midnight.
+
+- 3 PM: Detects 5 clones for today → Records 5, total = 100
+- Midnight: Detects 11 clones for today → Calculates diff (11 - 5 = 6) → Adds only 6, total = 106
+
+**No duplicate counting! ✅**
+
+### Data Structure
+
+`clone-data.json` stores the complete history:
+
+```json
+{
+  "total_clones": 320,
+  "recorded_dates": {
+    "2025-10-01": 15,
+    "2025-10-02": 22,
+    "2025-10-03": 18,
+    "2025-10-04": 20
+    // ... continues indefinitely
+  }
+}
+```
+
+`clone-stats.json` stays clean for Shields.io:
+
+```json
+{
+  "schemaVersion": 1,
+  "label": "total clones",
+  "message": "320",
+  "color": "black"
+}
+```
+
+### Automatic Execution
+
+The cron job runs daily at midnight UTC (9 AM KST):
+
+```yaml
+schedule:
+  - cron: '0 0 * * *'
+```
+
+---
+
+## Security Considerations
+
+- **Token Permissions**: The Personal Access Token has full repo access. Store it securely in GitHub Secrets—never commit it to your repository.
+- **API Rate Limits**: GitHub API has rate limits, but with daily execution, you'll never hit them.
+- **Data Privacy**: Clone counts are aggregated and don't expose individual users. The Gist is public, but contains no sensitive information.
+
+---
+
+## Results
+
+After implementing this system:
+
+✅ 320+ clones tracked (and counting)
+
+✅ Zero manual maintenance required
+
+✅ Permanent historical data preserved
+
+✅ Public badge displaying on README
+
+✅ Runs automatically every day
+
+---
+
+## Customization Options
+
+### Change Badge Color
+
+Modify the workflow:
+
+```yaml
+color: 'blue' # or orange, red, etc.
+```
+
+Or use hex colors:
+
+```yaml
+color: '1a1a1a' # dark gray
+```
+
+###Change Update Frequency
+
+Modify the cron schedule:
+
+```yaml
+cron: '0 */12 * * *'  # Every 12 hours
+cron: '0 0 * * 0'     # Weekly (every Sunday)
+```
+
+### Add More Metrics
+
+Extend the system to track:
+
+- Views (GitHub also provides view statistics)
+- Stars over time
+- Fork counts
+- Unique visitors
+
+---
+
+## Wrapping Up
+
+What started as frustration with GitHub's 14-day limit turned into a fully automated tracking system. Now I have permanent visibility into how my projects are being used—without lifting a finger after the initial setup.
+
+The best part? It's completely reusable. Set it up once, and it works forever. 🏃🏻
+
+If you implement this in your own projects, I'd love to hear about it! Feel free to reach out via email or leave a comment on [my guestbook](https://golee.me/guestbook).
+
+---
+
+## References
+
+- [GitHub Traffic API Documentation](https://docs.github.com/en/rest/metrics/traffic)
+- [GitHub Actions - Scheduled Events](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)
+- [Shields.io Endpoint Badge](https://shields.io/badges/endpoint-badge)
+- [GitHub Gist API](https://docs.github.com/en/rest/gists)

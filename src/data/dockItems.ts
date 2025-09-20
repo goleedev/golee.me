@@ -1,0 +1,68 @@
+import type { DockItem } from '../types';
+
+export const initialDockItems: Omit<DockItem, 'icon'>[] = [
+  {
+    id: 'about',
+    title: 'About Me',
+    isActive: false,
+    bounceCount: 0,
+    angle: -90,
+    zIndex: 10,
+  },
+  {
+    id: 'work',
+    title: 'Work',
+    isActive: false,
+    bounceCount: 0,
+    angle: -60,
+    zIndex: 11,
+  },
+  {
+    id: 'blog',
+    title: 'Blog',
+    isActive: false,
+    bounceCount: 0,
+    angle: -30,
+    zIndex: 12,
+  },
+  {
+    id: 'community',
+    title: 'Community',
+    isActive: false,
+    bounceCount: 0,
+    angle: 0,
+    zIndex: 13,
+  },
+  {
+    id: 'mentorship',
+    title: 'Mentorship',
+    isActive: false,
+    bounceCount: 0,
+    angle: 30,
+    zIndex: 14,
+  },
+  {
+    id: 'activities',
+    title: 'Activities',
+    isActive: false,
+    bounceCount: 0,
+    angle: 60,
+    zIndex: 15,
+  },
+  {
+    id: 'guestbook',
+    title: 'Guest Book',
+    isActive: false,
+    bounceCount: 0,
+    angle: 90,
+    zIndex: 16,
+  },
+  {
+    id: 'music',
+    title: 'Music',
+    isActive: false,
+    bounceCount: 0,
+    angle: 120,
+    zIndex: 17,
+  },
+];

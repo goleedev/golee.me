@@ -1,0 +1,175 @@
+name: Track Clone and View Statistics
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-stats:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get traffic data from GitHub
+        id: traffic
+        env:
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+        run: |
+          echo "📊 Fetching traffic data..."
+          
+          # Clone 데이터
+          clone_response=$(curl -s -H "Authorization: Bearer $GIST_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/traffic/clones")
+          
+          echo "=== Clone API Response ==="
+          echo "$clone_response" | jq '.'
+          echo "=========================="
+          
+          # View 데이터
+          view_response=$(curl -s -H "Authorization: Bearer $GIST_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/${{ github.repository }}/traffic/views")
+          
+          echo "=== View API Response ==="
+          echo "$view_response" | jq '.'
+          echo "========================="
+          
+          # JSON을 base64로 인코딩해서 output으로 전달
+          echo "clones_data=$(echo "$clone_response" | jq -c '.clones // []' | base64 -w 0)" >> $GITHUB_OUTPUT
+          echo "views_data=$(echo "$view_response" | jq -c '.views // []' | base64 -w 0)" >> $GITHUB_OUTPUT
+
+      - name: Update all stats in Gist
+        env:
+          GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+          GIST_ID: ${{ secrets.GIST_ID }}
+        run: |
+          echo "🔄 Updating statistics..."
+          
+          # Gist에서 현재 데이터 가져오기
+          current_gist=$(curl -s -H "Authorization: Bearer $GIST_TOKEN" \
+            "https://api.github.com/gists/$GIST_ID")
+          
+          # 기존 tracking 데이터
+          clone_tracking=$(echo "$current_gist" | jq -r '.files["clone-data.json"].content // "{\"total_clones\": 0, \"recorded_dates\": {}}"')
+          view_tracking=$(echo "$current_gist" | jq -r '.files["view-data.json"].content // "{\"total_views\": 0, \"recorded_dates\": {}}"')
+          
+          # Base64 디코딩
+          clones_data=$(echo "${{ steps.traffic.outputs.clones_data }}" | base64 -d)
+          views_data=$(echo "${{ steps.traffic.outputs.views_data }}" | base64 -d)
+          
+          # Clone 누적 계산
+          updated_clone_tracking=$(echo "$clone_tracking" | jq --argjson new_clones "$clones_data" '
+            .recorded_dates //= {} |
+            .total_clones //= 0 |
+            
+            (
+              $new_clones | map({
+                date: (.timestamp | split("T")[0]),
+                count: .count
+              })
+            ) as $daily_data |
+            
+            reduce $daily_data[] as $day (
+              .;
+              if (.recorded_dates[$day.date] // 0) == 0 then
+                .recorded_dates[$day.date] = $day.count |
+                .total_clones += $day.count
+              else
+                (($day.count - (.recorded_dates[$day.date] // 0)) as $diff |
+                  if $diff > 0 then
+                    .recorded_dates[$day.date] = $day.count |
+                    .total_clones += $diff
+                  else .
+                  end
+                )
+              end
+            )
+          ')
+          
+          clone_total=$(echo "$updated_clone_tracking" | jq -r '.total_clones')
+          echo "✅ Total clones: $clone_total"
+          
+          # View 누적 계산
+          updated_view_tracking=$(echo "$view_tracking" | jq --argjson new_views "$views_data" '
+            .recorded_dates //= {} |
+            .total_views //= 0 |
+            
+            (
+              $new_views | map({
+                date: (.timestamp | split("T")[0]),
+                count: .count
+              })
+            ) as $daily_data |
+            
+            reduce $daily_data[] as $day (
+              .;
+              if (.recorded_dates[$day.date] // 0) == 0 then
+                .recorded_dates[$day.date] = $day.count |
+                .total_views += $day.count
+              else
+                (($day.count - (.recorded_dates[$day.date] // 0)) as $diff |
+                  if $diff > 0 then
+                    .recorded_dates[$day.date] = $day.count |
+                    .total_views += $diff
+                  else .
+                  end
+                )
+              end
+            )
+          ')
+          
+          view_total=$(echo "$updated_view_tracking" | jq -r '.total_views')
+          echo "✅ Total views: $view_total"
+          
+          # Badge JSON 생성
+          clone_badge=$(jq -n \
+            --arg total "$clone_total" \
+            '{
+              schemaVersion: 1,
+              label: "total clones",
+              message: $total,
+              color: "black"
+            }')
+          
+          view_badge=$(jq -n \
+            --arg total "$view_total" \
+            '{
+              schemaVersion: 1,
+              label: "total views",
+              message: $total,
+              color: "#fd355a"
+            }')
+          
+          # Gist 업데이트 (4개 파일 모두)
+          echo "📝 Updating Gist..."
+          
+          update_payload=$(jq -n \
+            --arg clone_data "$updated_clone_tracking" \
+            --arg clone_badge "$clone_badge" \
+            --arg view_data "$updated_view_tracking" \
+            --arg view_badge "$view_badge" \
+            '{
+              files: {
+                "clone-data.json": {
+                  content: $clone_data
+                },
+                "clone-stats.json": {
+                  content: $clone_badge
+                },
+                "view-data.json": {
+                  content: $view_data
+                },
+                "view-stats.json": {
+                  content: $view_badge
+                }
+              }
+            }')
+          
+          curl -s -X PATCH \
+            -H "Authorization: Bearer $GIST_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/gists/$GIST_ID" \
+            -d "$update_payload"
+          
+          echo "🎉 Gist updated successfully!"
+          echo "📊 Total Clones: $clone_total | Total Views: $view_total"
