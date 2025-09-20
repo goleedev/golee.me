@@ -1048,7 +1048,7 @@ const MacOSPortfolio = () => {
       {!imageLoaded && (
         <div className="absolute inset-0 bg-gray-100 flex items-center justify-center z-50">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="w-12 h-12 border-4 border-gray-300 border-t-gray-800 rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-gray-600 font-light">Loading...</p>
           </div>
         </div>
