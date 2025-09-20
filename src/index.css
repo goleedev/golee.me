@@ -1,0 +1,242 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: #ffffff;
+  overflow: hidden;
+  height: 100vh;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+#root {
+  height: 100vh;
+  width: 100vw;
+}
+
+/* macOS 스크롤바 */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile-specific scrollbar styles */
+@media (max-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 2px;
+  }
+}
+
+.absolute {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  /* Prevent text selection on mobile */
+  * {
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Allow text selection in content areas */
+  .window-content,
+  .window-content * {
+    -webkit-user-select: text;
+    user-select: text;
+  }
+
+  /* Better touch targets */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .dock-item {
+    min-height: 40px;
+    min-width: 40px;
+  }
+
+  /* Prevent zoom on form inputs */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  /* Smoother scrolling on mobile */
+  .overflow-auto {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  /* Hide hover effects on mobile */
+  .group:hover .tooltip {
+    opacity: 0 !important;
+  }
+
+  /* Mobile-specific animations */
+  .window {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Safe area adjustments for devices with notches */
+  .menu-bar {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .dock {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Prevent rubber band scrolling */
+  body {
+    position: fixed;
+    overflow: hidden;
+  }
+
+  /* Mobile window animations */
+  .window-mobile {
+    animation: slideInFromBottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes slideInFromBottom {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* Mobile sticky notes - fixed position */
+  .sticky-mobile {
+    position: fixed !important;
+    cursor: default !important;
+  }
+
+  /* Improved touch feedback */
+  .dock-item:active {
+    transform: scale(0.95);
+    transition: transform 0.1s ease;
+  }
+
+  /* Hide desktop-only elements */
+  .desktop-only {
+    display: none !important;
+  }
+
+  /* Mobile menu adjustments */
+  .menu-bar-mobile {
+    backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.9);
+  }
+}
+
+/* Desktop-specific styles */
+@media (min-width: 769px) {
+  .mobile-only {
+    display: none !important;
+  }
+
+  /* Desktop hover effects */
+  .dock-item:hover {
+    transform: translateY(-2px);
+    transition: transform 0.2s ease;
+  }
+
+  /* Desktop window shadows */
+  .window-desktop {
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25),
+      0 0 0 1px rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* High DPI displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .window {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+}
+
+/* Landscape orientation on mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+  .menu-bar {
+    height: 32px;
+  }
+
+  .dock {
+    bottom: 8px;
+  }
+
+  .dock-item {
+    min-height: 48px;
+    min-width: 48px;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .window {
+    background: rgba(28, 28, 30, 0.95);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .menu-bar {
+    background: rgba(28, 28, 30, 0.9);
+    color: white;
+  }
+
+  .dock {
+    background: rgba(28, 28, 30, 0.7);
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus styles for accessibility */
+button:focus-visible,
+.dock-item:focus-visible {
+  outline: 2px solid #007aff;
+  outline-offset: 2px;
+}
