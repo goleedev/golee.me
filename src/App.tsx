@@ -13,7 +13,6 @@ import { GuestbookContent } from './components/window-contents/GuestbookContent'
 import { MentorshipContent } from './components/window-contents/MentorshipContent';
 import { MusicContent } from './components/window-contents/MusicContent';
 import { WorkContent } from './components/window-contents/WorkContent';
-import { SpeakingContent } from './components/WindowContent';
 import type {
   DockItem,
   DragState,
@@ -25,6 +24,7 @@ import type {
   Track,
   WindowState,
 } from './types';
+import { ActivitiesContent } from './components/window-contents/ActivitiesContent';
 
 const MacOSPortfolio = () => {
   const [windows, setWindows] = useState<WindowState[]>([]);
@@ -104,7 +104,7 @@ const MacOSPortfolio = () => {
     const contents = {
       about: <AboutContent />,
       work: <WorkContent />,
-      speaking: <SpeakingContent />,
+      activities: <ActivitiesContent />,
       community: <CommunityContent />,
       mentorship: <MentorshipContent />,
       guestbook: <GuestbookContent />,
@@ -159,9 +159,9 @@ const MacOSPortfolio = () => {
       zIndex: 13,
     },
     {
-      id: 'speaking',
+      id: 'activities',
       icon: <FolderIcon />,
-      title: 'Speaking',
+      title: 'Activities',
       isActive: false,
       bounceCount: 0,
       angle: 30,
@@ -225,8 +225,8 @@ const MacOSPortfolio = () => {
         x: centerX + radiusX * Math.cos((315 * Math.PI) / 180),
         y: centerY + radiusY * Math.sin((320 * Math.PI) / 180),
       },
-      // Speaking - 2시 방향 아래 오른쪽 (2시 30분 = 345°)
-      speaking: {
+      // Activities - 2시 방향 아래 오른쪽 (2시 30분 = 345°)
+      activities: {
         x: centerX + radiusX * Math.cos((360 * Math.PI) / 180),
         y: centerY + radiusY * Math.sin((345 * Math.PI) / 180),
       },

@@ -10,7 +10,7 @@ const createIconComponent = (itemId: string) => {
     work: <FolderIcon />,
     community: <NoteIcon />,
     mentorship: <NoteIcon />,
-    speaking: <FolderIcon />,
+    activities: <FolderIcon />,
     guestbook: <FolderIcon />,
     music: <MusicIcon />,
   };
