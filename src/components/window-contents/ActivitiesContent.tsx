@@ -39,16 +39,16 @@ export const ActivitiesContent = () => {
     //   organization: 'Jpub',
     //   image: '/activities/lead-developer-book.jpg',
     // },
-    // {
-    //   id: 'k-devcon-recorder-2025',
-    //   title: 'RE:CORDER Interview Project',
-    //   description:
-    //     'Featured in K-DEVCON\'s "RE:CORDER" interview project, which records and highlights the work and lives of diverse people in the IT industry. Shared personal career journey, experiences about working in tech, building pioneering women in tech community in South Korea, and insights about the transition from Korea to working at Cloudflare in London.',
-    //   date: 'September 2025',
-    //   category: 'interview',
-    //   organization: 'K-DEVCON',
-    //   image: '/activities/k-devcon-recorder.jpg',
-    // },
+    {
+      id: 'k-devcon-recorder-2025',
+      title: 'RE:CORDER Interview Project',
+      description:
+        'Featured in K-DEVCON\'s "RE:CORDER" interview project, which records and highlights the work and lives of diverse people in the IT industry. Shared personal career journey, experiences about working in tech, building pioneering women in tech community in South Korea, and insights about the transition from Korea to working at Cloudflare in London.',
+      date: 'September 2025',
+      category: 'interview',
+      organization: 'K-DEVCON',
+      image: '/activities/k-devcon-recorder.jpg',
+    },
     {
       id: 'loko-devgirls-2025',
       title: 'Reflecting on 6 Months at Cloudflare',
