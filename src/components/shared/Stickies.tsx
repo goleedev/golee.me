@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import type { StickyState } from '../types';
+import type { StickyState } from '../../types';
 
 interface MetricsData {
   visitors: number;
@@ -49,9 +49,15 @@ const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
       }
 
       setMetrics(result.data);
-      console.log('Analytics data updated successfully from Pages Functions');
     } catch (error) {
-      console.error('Analytics API Error:', error);
+      // API 실패 시 기본값 설정
+      setMetrics({
+        visitors: 0,
+        pageViews: 0,
+        countries: 0,
+        lastVisitor: '--',
+        topCountry: '--',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -88,7 +94,7 @@ const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
           <>
             Today's visitors: {metrics.visitors.toLocaleString() || '--'}
             <br />
-            Page views: {metrics.pageViews.toLocaleString() || '--'}
+            Total page views: {metrics.pageViews.toLocaleString() || '--'}
             <br />
             Countries: {metrics.countries || '--'}
             <br />

@@ -21,6 +21,7 @@ export type WindowState = {
   size: Size;
   originalPosition?: Position;
   originalSize?: Size;
+  wasAutoMaximized?: boolean; // Track if window was auto-maximized due to screen size
 };
 
 export type Track = {

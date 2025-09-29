@@ -10,10 +10,10 @@ export const WorkContent = () => {
       description:
         'Building secure dashboard experiences and improving user workflows for Zero Trust products serving millions of users globally.',
       achievements: [
-        'Redesigned Zero Trust dashboard onboarding flows, achieving 2-4x improvement in completion rates across key user journeys',
-        'Extended Cloudflare CASB from visibility-only detection to actionable security controls for SaaS misconfigurations',
-        'Overhauled some core UI components reducing duplicate implementations and improving accessibility compliance (WCAG 2.2)',
-        'Migrated MCP Agent Gateway into Zero Trust dashboard, unifying security controls and Access policies as part of Cloudflare AI Week launch',
+        "Redesigned core dashboard workflows for Cloudflare's Zero Trust platform, significantly improving completion rates and user experience across key journeys.",
+        'Overhauled core UI components at Cloudflare, improving code reusability and accessibility to industry-leading standards.',
+        'Extended Cloudflare CASB from visibility-only detection to actionable remediation workflows, adding automated security controls for SaaS misconfigurations.',
+        "Integrated MCP Agent Gateway into Zero Trust dashboard, unifying security and access management as part of Cloudflare's AI Week launch.",
       ],
       technologies: ['React', 'TypeScript', 'Jest', 'Cypress', 'Tailwind CSS'],
     },

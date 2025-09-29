@@ -79,6 +79,7 @@ type PlayIconType = 'play' | 'pause' | 'loading';
 export const MusicContent: React.FC<MusicContentProps> = ({
   currentTrack,
   isLoadingTrack,
+  isPlaying,
   setIsPlaying,
 }) => {
   const playerRef = useRef<YouTubePlayer | null>(null);
@@ -100,6 +101,15 @@ export const MusicContent: React.FC<MusicContentProps> = ({
   });
 
   const [iconType, setIconType] = useState<PlayIconType>('loading');
+
+  // Use the isPlaying prop from parent
+  useEffect(() => {
+    if (isPlaying) {
+      setIconType('pause');
+    } else {
+      setIconType('play');
+    }
+  }, [isPlaying]);
 
   useEffect(() => {
     const updateDimensions = () => {
@@ -137,6 +147,23 @@ export const MusicContent: React.FC<MusicContentProps> = ({
   useEffect(() => {
     if (window.YT?.Player) {
       setApiReady(true);
+      return;
+    }
+
+    // 이미 스크립트가 로드 중인지 확인
+    const existingScript = document.querySelector(
+      'script[src="https://www.youtube.com/iframe_api"]'
+    );
+    if (existingScript) {
+      // 스크립트가 이미 있으면 API가 로드될 때까지 기다림
+      const checkApi = () => {
+        if (window.YT?.Player) {
+          setApiReady(true);
+        } else {
+          setTimeout(checkApi, 100);
+        }
+      };
+      checkApi();
       return;
     }
 
@@ -417,7 +444,11 @@ export const MusicContent: React.FC<MusicContentProps> = ({
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const isLoading =
-    isLoadingTrack || !apiReady || isPlayerLoading || isBuffering;
+    isLoadingTrack ||
+    !apiReady ||
+    isPlayerLoading ||
+    isBuffering ||
+    !currentTrack;
   const isInteractionDisabled = !playerReady || isLoading;
 
   // 🔥 간단한 아이콘 렌더링 함수
@@ -444,11 +475,12 @@ export const MusicContent: React.FC<MusicContentProps> = ({
   };
 
   const getLoadingMessage = (): string => {
+    if (!currentTrack) return 'Loading track...';
     if (isLoadingTrack) return 'Loading track...';
     if (!apiReady) return 'Loading player...';
     if (isPlayerLoading) return 'Initializing...';
     if (isBuffering) return 'Buffering...';
-    return '';
+    return 'Loading...';
   };
 
   return (

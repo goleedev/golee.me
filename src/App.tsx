@@ -1,42 +1,67 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import DesktopIcon from './components/DesktopIcon';
-import Dock from './components/Dock';
-import FolderIcon from './components/FolderIcon';
-import MenuBar from './components/MenuBar';
-import MusicIcon from './components/MusicIcon';
-import NoteIcon from './components/NoteIcon';
-import Stickies from './components/Stickies';
-import Window from './components/Window';
-import { AboutContent } from './components/window-contents/AboutContent';
-import { CommunityContent } from './components/window-contents/CommunityContent';
-import { GuestbookContent } from './components/window-contents/GuestbookContent';
-import { MentorshipContent } from './components/window-contents/MentorshipContent';
-import { MusicContent } from './components/window-contents/MusicContent';
-import { WorkContent } from './components/window-contents/WorkContent';
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  useLocation,
+} from 'react-router-dom';
+import DesktopIcon from './components/desktop/DesktopIcon';
+import Dock from './components/dock/Dock';
+import MenuBar from './components/layout/MenuBar';
+import Stickies from './components/shared/Stickies';
+import Window from './components/layout/Window';
+import { AboutContent } from './components/windows/AboutContent';
+import { CommunityContent } from './components/windows/CommunityContent';
+import { GuestbookContent } from './components/windows/GuestbookContent';
+import { MentorshipContent } from './components/windows/MentorshipContent';
+import { MusicContent } from './components/windows/MusicContent';
+import { WorkContent } from './components/windows/WorkContent';
+import { ActivitiesContent } from './components/windows/ActivitiesContent';
+import { initialDockItems } from './data/dockItems';
+import { initialStickies } from './data/initialStickies';
+import { useWindowManagement } from './hooks/useWindowManagement';
+import { useMusic } from './hooks/useMusic';
+import { useDesktopIcons } from './hooks/useDesktopIcons';
+import FolderIcon from './components/shared/icons/FolderIcon';
+import MusicIcon from './components/shared/icons/MusicIcon';
+import NoteIcon from './components/shared/icons/NoteIcon';
 import type {
   DockItem,
-  DragState,
-  IconDragState,
   Position,
   Size,
-  StickyDragState,
   StickyState,
-  Track,
-  WindowState,
+  DragState,
+  IconDragState,
+  StickyDragState,
 } from './types';
-import { ActivitiesContent } from './components/window-contents/ActivitiesContent';
 
 const MacOSPortfolio = () => {
-  const [windows, setWindows] = useState<WindowState[]>([]);
+  const location = useLocation();
   const [dockItems, setDockItems] = useState<DockItem[]>([]);
   const [stickies, setStickies] = useState<StickyState[]>([]);
-  const [highestZIndex, setHighestZIndex] = useState(1000);
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
-  const [isLoadingTrack, setIsLoadingTrack] = useState(true);
-  const [isPlaying, setIsPlaying] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+
+  // Get current page ID from URL
+  const currentPageId = location.pathname.substring(1); // Remove leading slash
+
+  // Custom hooks
+  const {
+    windows,
+    setWindows,
+    highestZIndex,
+    setHighestZIndex,
+    constrainPosition,
+    constrainSize,
+    openWindow,
+    closeWindow,
+    minimizeWindow,
+    maximizeWindow,
+    bringToFront,
+  } = useWindowManagement(isMobile);
+
+  const { currentTrack, isLoadingTrack, isPlaying, setIsPlaying } = useMusic();
 
   const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
@@ -60,8 +85,14 @@ const MacOSPortfolio = () => {
   });
 
   const [hasDraggedIcon, setHasDraggedIcon] = useState(false);
-  const [selectedIcon, setSelectedIcon] = useState<string | null>(null);
-  const [lastClickTime, setLastClickTime] = useState(0);
+
+  const {
+    desktopIconPositions,
+    setDesktopIconPositions,
+    selectedIcon,
+    handleIconClick,
+  } = useDesktopIcons(isMobile);
+
   const [resizeState, setResizeState] = useState<{
     isResizing: boolean;
     windowId: string | null;
@@ -76,17 +107,83 @@ const MacOSPortfolio = () => {
     startSize: { width: 0, height: 0 },
   });
 
-  const [desktopIconPositions, setDesktopIconPositions] = useState<
-    Record<string, Position>
-  >({});
-
   const desktopRef = useRef<HTMLDivElement>(null);
   const rafId = useRef<number>(null);
+  const processedUrlRef = useRef<string>('');
 
-  // Constants for layout constraints
-  const MENU_BAR_HEIGHT = 40;
-  const DOCK_HEIGHT = 70;
-  const WINDOW_MARGIN = 0;
+  // Window contents mapping
+  const getWindowContent = useCallback(
+    (id: string) => {
+      const contents = {
+        about: <AboutContent />,
+        work: <WorkContent />,
+        activities: <ActivitiesContent />,
+        community: <CommunityContent />,
+        mentorship: <MentorshipContent />,
+        guestbook: <GuestbookContent />,
+        music: (
+          <MusicContent
+            currentTrack={currentTrack}
+            isLoadingTrack={isLoadingTrack}
+            isPlaying={isPlaying}
+            setIsPlaying={setIsPlaying}
+          />
+        ),
+      };
+      return contents[id as keyof typeof contents] || <AboutContent />;
+    },
+    [currentTrack, isLoadingTrack, isPlaying, setIsPlaying]
+  );
+
+  // Auto-open window based on URL
+  useEffect(() => {
+    if (currentPageId && currentPageId !== '' && dockItems.length > 0) {
+      // Only process if this URL hasn't been processed yet
+      if (processedUrlRef.current !== currentPageId) {
+        processedUrlRef.current = currentPageId;
+
+        // Check if window is already open
+        const existingWindow = windows.find((w) => w.id === currentPageId);
+
+        if (!existingWindow) {
+          // Open the window
+          const dockItem = dockItems.find((item) => item.id === currentPageId);
+          if (dockItem) {
+            openWindow(currentPageId, dockItem, getWindowContent);
+            // Wait for window to be created before maximizing
+            setTimeout(() => {
+              const newWindow = windows.find((w) => w.id === currentPageId);
+              if (newWindow && !newWindow.isMaximized) {
+                maximizeWindow(currentPageId);
+              }
+            }, 200);
+          }
+        } else {
+          // If window is already open, just bring it to front and maximize
+          bringToFront(currentPageId);
+          if (!existingWindow.isMaximized) {
+            setTimeout(() => {
+              maximizeWindow(currentPageId);
+            }, 100);
+          }
+        }
+      }
+    }
+  }, [currentPageId, dockItems.length, windows.length, getWindowContent]);
+
+  // Force re-render of music window when music state changes
+  useEffect(() => {
+    if (currentPageId === 'music') {
+      const musicWindow = windows.find((w) => w.id === 'music');
+      if (musicWindow) {
+        // Force re-render by updating the window content
+        const updatedWindows = windows.map((w) =>
+          w.id === 'music' ? { ...w, content: getWindowContent('music') } : w
+        );
+        setWindows(updatedWindows);
+      }
+    }
+  }, [currentTrack, isLoadingTrack, isPlaying, currentPageId]);
 
   // Mobile detection
   useEffect(() => {
@@ -98,94 +195,6 @@ const MacOSPortfolio = () => {
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
-
-  // Window contents mapping
-  const getWindowContent = (id: string) => {
-    const contents = {
-      about: <AboutContent />,
-      work: <WorkContent />,
-      activities: <ActivitiesContent />,
-      community: <CommunityContent />,
-      mentorship: <MentorshipContent />,
-      guestbook: <GuestbookContent />,
-      music: (
-        <MusicContent
-          currentTrack={currentTrack}
-          isLoadingTrack={isLoadingTrack}
-          isPlaying={isPlaying}
-          setIsPlaying={setIsPlaying}
-        />
-      ),
-    };
-    return contents[id as keyof typeof contents] || <AboutContent />;
-  };
-
-  // All icons are now folder-style with consistent design (no hover effects)
-  const initialDockItems = [
-    {
-      id: 'about',
-      icon: <NoteIcon />,
-      title: 'About Me',
-      isActive: false,
-      bounceCount: 0,
-      angle: -90,
-      zIndex: 10,
-    },
-    {
-      id: 'work',
-      icon: <NoteIcon />,
-      title: 'Work',
-      isActive: false,
-      bounceCount: 0,
-      angle: -60,
-      zIndex: 11,
-    },
-    {
-      id: 'community',
-      icon: <FolderIcon />,
-      title: 'Community',
-      isActive: false,
-      bounceCount: 0,
-      angle: -30,
-      zIndex: 12,
-    },
-    {
-      id: 'mentorship',
-      icon: <NoteIcon />,
-      title: 'Mentorship',
-      isActive: false,
-      bounceCount: 0,
-      angle: 0,
-      zIndex: 13,
-    },
-    {
-      id: 'activities',
-      icon: <FolderIcon />,
-      title: 'Activities',
-      isActive: false,
-      bounceCount: 0,
-      angle: 30,
-      zIndex: 14,
-    },
-    {
-      id: 'guestbook',
-      icon: <FolderIcon />,
-      title: 'Guest Book',
-      isActive: false,
-      bounceCount: 0,
-      angle: 60,
-      zIndex: 15,
-    },
-    {
-      id: 'music',
-      icon: <MusicIcon />,
-      title: 'Music',
-      isActive: false,
-      bounceCount: 0,
-      angle: 90,
-      zIndex: 16,
-    },
-  ];
 
   // Initialize
   useEffect(() => {
@@ -202,331 +211,31 @@ const MacOSPortfolio = () => {
     return () => clearTimeout(timeout);
   }, []);
 
-  // Get specific icon positions based on the exact image layout
-  const getBagelIconPositions = (centerX: number, centerY: number) => {
-    // 베이글의 타원형 반지름
-    const radiusX = Math.min(window.innerWidth, window.innerHeight) * 0.21;
-    const radiusY = Math.min(window.innerWidth, window.innerHeight) * 0.22;
-
-    // 시계 방향: 12시가 -90°(270°), 3시가 0°, 6시가 90°, 9시가 180°
-    return {
-      // About Me - 10시 방향 (10시 = 210°)
-      about: {
-        x: centerX + radiusX * Math.cos((220 * Math.PI) / 180),
-        y: centerY + radiusY * Math.sin((230 * Math.PI) / 180),
-      },
-      // Work - 2시 방향 (2시 = -30° = 330°)
-      work: {
-        x: centerX + radiusX * Math.cos((350 * Math.PI) / 180),
-        y: centerY + radiusY * Math.sin((300 * Math.PI) / 180),
-      },
-      // Community - 2시 방향 아래 왼쪽 (1시 30분 = 315°)
-      community: {
-        x: centerX + radiusX * Math.cos((315 * Math.PI) / 180),
-        y: centerY + radiusY * Math.sin((320 * Math.PI) / 180),
-      },
-      // Activities - 2시 방향 아래 오른쪽 (2시 30분 = 345°)
-      activities: {
-        x: centerX + radiusX * Math.cos((360 * Math.PI) / 180),
-        y: centerY + radiusY * Math.sin((345 * Math.PI) / 180),
-      },
-      // Music - 5시 방향 (5시 = 60°)
-      music: {
-        x: centerX + radiusX * Math.cos((40 * Math.PI) / 180),
-        y: centerY + radiusY * Math.sin((60 * Math.PI) / 180),
-      },
-      // Mentorship - 7시 방향 (7시 = 120°)
-      mentorship: {
-        x: centerX + radiusX * Math.cos((120 * Math.PI) / 180),
-        y: centerY + radiusY * Math.sin((130 * Math.PI) / 180),
-      },
-      // Guest Book - 7시 방향 근처 (8시 = 150°)
-      guestbook: {
-        x: centerX + radiusX * Math.cos((150 * Math.PI) / 180),
-        y: centerY + radiusY * Math.sin((150 * Math.PI) / 180),
-      },
-    };
-  };
-
   useEffect(() => {
-    setDockItems(initialDockItems);
+    const dockItemsWithIcons = initialDockItems.map((item) => ({
+      ...item,
+      icon: getIconForItem(item.id),
+    }));
+    setDockItems(dockItemsWithIcons);
+    setStickies(initialStickies);
+  }, []);
 
-    if (!isMobile) {
-      const centerX = window.innerWidth * 0.5;
-      const centerY = window.innerHeight * 0.5;
-      const positions = getBagelIconPositions(centerX, centerY);
-      setDesktopIconPositions(positions);
-    }
-
-    // Initialize stickies
-    setStickies([
-      {
-        id: 'analytics',
-        position: { x: 16, y: 64 },
-        zIndex: 1001,
-      },
-    ]);
-
-    fetchYouTubeTrack();
-  }, [isMobile]);
-
-  useEffect(() => {
-    const updateDesktopSize = () => {
-      if (desktopRef.current && !isMobile) {
-        if (Object.keys(desktopIconPositions).length === 0) {
-          const centerX = window.innerWidth * 0.5;
-          const centerY = window.innerHeight * 0.5;
-          const positions = getBagelIconPositions(centerX, centerY);
-          setDesktopIconPositions(positions);
-        }
-      }
+  const getIconForItem = (id: string) => {
+    const iconMap = {
+      about: <NoteIcon />,
+      work: <NoteIcon />,
+      community: <FolderIcon />,
+      mentorship: <NoteIcon />,
+      activities: <FolderIcon />,
+      guestbook: <FolderIcon />,
+      music: <MusicIcon />,
     };
-
-    updateDesktopSize();
-    window.addEventListener('resize', updateDesktopSize);
-    return () => window.removeEventListener('resize', updateDesktopSize);
-  }, [desktopIconPositions, isMobile]);
-
-  const fetchYouTubeTrack = async () => {
-    setIsLoadingTrack(true);
-
-    const track: Track = {
-      id: 'rA6DIHIg5To',
-      title: 'Gone Girl',
-      artist: 'SZA',
-      duration: '3:59',
-      thumbnail: 'https://img.youtube.com/vi/rA6DIHIg5To/maxresdefault.jpg',
-      url: 'https://www.youtube.com/watch?v=rA6DIHIg5To',
-    };
-
-    setTimeout(() => {
-      setCurrentTrack(track);
-      setIsLoadingTrack(false);
-    }, 1000);
+    return iconMap[id as keyof typeof iconMap] || <NoteIcon />;
   };
 
-  // Updated constrainPosition to avoid dock area (desktop only)
-  const constrainPosition = (pos: Position, size: Size): Position => {
-    if (isMobile) {
-      return { x: 0, y: MENU_BAR_HEIGHT };
-    }
-
-    const availableHeight = window.innerHeight - MENU_BAR_HEIGHT - DOCK_HEIGHT;
-
-    return {
-      x: Math.max(
-        WINDOW_MARGIN,
-        Math.min(pos.x, window.innerWidth - size.width - WINDOW_MARGIN)
-      ),
-      y: Math.max(
-        MENU_BAR_HEIGHT,
-        Math.min(pos.y, availableHeight - size.height + MENU_BAR_HEIGHT)
-      ),
-    };
-  };
-
-  // Updated constrainSize for resize operations (desktop only)
-  const constrainSize = (size: Size, position: Position): Size => {
-    if (isMobile) {
-      return {
-        width: window.innerWidth,
-        height: window.innerHeight - MENU_BAR_HEIGHT - DOCK_HEIGHT,
-      };
-    }
-
-    const maxWidth = window.innerWidth - position.x - WINDOW_MARGIN;
-    const maxHeight =
-      window.innerHeight -
-      MENU_BAR_HEIGHT -
-      DOCK_HEIGHT -
-      position.y +
-      MENU_BAR_HEIGHT;
-
-    return {
-      width: Math.min(Math.max(300, size.width), maxWidth),
-      height: Math.min(Math.max(200, size.height), maxHeight),
-    };
-  };
-
-  // 아이콘을 맨 앞으로 가져오는 함수
-  const bringIconToFront = useCallback(
-    (iconId: string) => {
-      if (isMobile) return; // Disable on mobile
-
-      setDockItems((items) => {
-        const maxZIndex = Math.max(...items.map((item) => item.zIndex));
-        return items.map((item) =>
-          item.id === iconId ? { ...item, zIndex: maxZIndex + 1 } : item
-        );
-      });
-    },
-    [isMobile]
-  );
-
-  // 스티키를 맨 앞으로 가져오는 함수
-  const bringStickyToFront = useCallback(
-    (stickyId: string) => {
-      if (isMobile) return; // Disable drag on mobile
-
-      setStickies((stickies) =>
-        stickies.map((s) =>
-          s.id === stickyId ? { ...s, zIndex: highestZIndex + 1 } : s
-        )
-      );
-      setHighestZIndex((prev) => prev + 1);
-    },
-    [highestZIndex, isMobile]
-  );
-
-  const openWindow = (windowId: string) => {
-    const existingWindow = windows.find((w) => w.id === windowId);
-    if (existingWindow) {
-      if (existingWindow.isMinimized) {
-        setWindows(
-          windows.map((w) =>
-            w.id === windowId
-              ? { ...w, isMinimized: false, zIndex: highestZIndex + 1 }
-              : w
-          )
-        );
-        setHighestZIndex((prev) => prev + 1);
-      } else {
-        bringToFront(windowId);
-      }
-      return;
-    }
-
-    const dockItem = initialDockItems.find((item) => item.id === windowId);
-    if (!dockItem) return;
-
-    // Mobile: full screen, Desktop: normal size
-    const baseSize = isMobile
-      ? {
-          width: window.innerWidth,
-          height: window.innerHeight - MENU_BAR_HEIGHT - DOCK_HEIGHT,
-        }
-      : { width: 600, height: 500 };
-
-    const newSize = isMobile
-      ? baseSize
-      : windowId === 'music'
-      ? { width: 300, height: 500 }
-      : baseSize;
-
-    const newWindow: WindowState = {
-      id: windowId,
-      title: dockItem.title,
-      icon: dockItem.icon,
-      content: getWindowContent(windowId),
-      isOpen: true,
-      isMinimized: false,
-      isMaximized: isMobile, // Always maximized on mobile
-      zIndex: highestZIndex + 1,
-      position: constrainPosition(
-        isMobile
-          ? { x: 0, y: MENU_BAR_HEIGHT }
-          : {
-              x: Math.random() * 200 + 100,
-              y: Math.random() * 100 + 80,
-            },
-        newSize
-      ),
-      size: newSize,
-    };
-
-    setWindows([...windows, newWindow]);
-    setHighestZIndex((prev) => prev + 1);
-
-    setDockItems((items) =>
-      items.map((item) =>
-        item.id === windowId
-          ? { ...item, isActive: true, bounceCount: 0 }
-          : item
-      )
-    );
-  };
-
-  const closeWindow = (windowId: string) => {
-    setWindows(windows.filter((w) => w.id !== windowId));
-    setDockItems((items) =>
-      items.map((item) =>
-        item.id === windowId
-          ? { ...item, isActive: false, bounceCount: 0 }
-          : item
-      )
-    );
-  };
-
-  const minimizeWindow = (windowId: string) => {
-    if (isMobile) return; // Disable minimize on mobile
-
-    setWindows(
-      windows.map((w) => (w.id === windowId ? { ...w, isMinimized: true } : w))
-    );
-
-    setDockItems((items) =>
-      items.map((item) =>
-        item.id === windowId
-          ? { ...item, bounceCount: item.bounceCount + 1 }
-          : item
-      )
-    );
-  };
-
-  // Updated maximizeWindow to avoid dock area (disabled on mobile)
-  const maximizeWindow = (windowId: string) => {
-    if (isMobile) return; // Already maximized on mobile
-
-    const availableHeight = window.innerHeight - MENU_BAR_HEIGHT - DOCK_HEIGHT;
-
-    setWindows(
-      windows.map((w): WindowState => {
-        if (w.id !== windowId) return w;
-
-        if (w.isMaximized) {
-          // 이미 최대화된 상태라면 원래 크기로 복원
-          const restoredPosition = w.originalPosition || w.position;
-          const restoredSize = w.originalSize || w.size;
-
-          return {
-            ...w,
-            isMaximized: false,
-            position: restoredPosition,
-            size: restoredSize,
-            // 복원 후에는 original 값들을 제거
-            originalPosition: undefined,
-            originalSize: undefined,
-          };
-        } else {
-          // 최대화되지 않은 상태라면 최대화하면서 원래 위치/크기 저장
-          return {
-            ...w,
-            isMaximized: true,
-            originalPosition: { ...w.position }, // 현재 위치 저장
-            originalSize: { ...w.size }, // 현재 크기 저장
-            position: { x: WINDOW_MARGIN, y: MENU_BAR_HEIGHT },
-            size: {
-              width: window.innerWidth - WINDOW_MARGIN * 2,
-              height: availableHeight - WINDOW_MARGIN,
-            },
-          };
-        }
-      })
-    );
-  };
-
-  const bringToFront = (windowId: string) => {
-    setWindows(
-      windows.map((w) =>
-        w.id === windowId ? { ...w, zIndex: highestZIndex + 1 } : w
-      )
-    );
-    setHighestZIndex((prev) => prev + 1);
-  };
-
-  const handleMouseDown = useCallback(
+  const handleWindowMouseDown = useCallback(
     (e: React.MouseEvent, windowId: string) => {
-      if (isMobile) return; // Disable drag on mobile
+      if (isMobile) return;
       if ((e.target as HTMLElement).closest('.window-controls')) return;
 
       const window = windows.find((w) => w.id === windowId);
@@ -541,7 +250,7 @@ const MacOSPortfolio = () => {
         startWindowPos: window.position,
       });
     },
-    [windows, isMobile]
+    [windows, isMobile, bringToFront]
   );
 
   const handleMouseMove = useCallback(
@@ -579,114 +288,6 @@ const MacOSPortfolio = () => {
     [dragState, windows, constrainPosition, isMobile]
   );
 
-  const handleIconMouseMove = useCallback(
-    (e: MouseEvent) => {
-      if (isMobile) return; // Disable icon drag on mobile
-
-      if (!iconDragState.isDragging && iconDragState.iconId) {
-        const deltaX = e.clientX - iconDragState.startPos.x;
-        const deltaY = e.clientY - iconDragState.startPos.y;
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-
-        if (distance > 5) {
-          setIconDragState((prev) => ({ ...prev, isDragging: true }));
-          setHasDraggedIcon(true);
-        }
-        return;
-      }
-
-      if (!iconDragState.isDragging || !iconDragState.iconId) return;
-
-      const deltaX = e.clientX - iconDragState.startPos.x;
-      const deltaY = e.clientY - iconDragState.startPos.y;
-
-      const newPosition = {
-        x: iconDragState.startIconPos.x + deltaX,
-        y: iconDragState.startIconPos.y + deltaY,
-      };
-
-      const constrainedPosition = {
-        x: Math.max(32, Math.min(newPosition.x, window.innerWidth - 32)),
-        y: Math.max(
-          72,
-          Math.min(newPosition.y, window.innerHeight - DOCK_HEIGHT - 32)
-        ),
-      };
-
-      setDesktopIconPositions((prev) => ({
-        ...prev,
-        [iconDragState.iconId!]: constrainedPosition,
-      }));
-    },
-    [iconDragState, isMobile]
-  );
-
-  // 스티키 드래그 핸들러들
-  const handleStickyMouseDown = useCallback(
-    (e: React.MouseEvent, stickyId: string) => {
-      if (isMobile) return; // Disable sticky drag on mobile
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      const sticky = stickies.find((s) => s.id === stickyId);
-      if (!sticky) return;
-
-      bringStickyToFront(stickyId);
-
-      setStickyDragState({
-        isDragging: true,
-        stickyId,
-        startPos: { x: e.clientX, y: e.clientY },
-        startStickyPos: sticky.position,
-      });
-    },
-    [stickies, bringStickyToFront, isMobile]
-  );
-
-  const handleStickyMouseMove = useCallback(
-    (e: MouseEvent) => {
-      if (isMobile || !stickyDragState.isDragging || !stickyDragState.stickyId)
-        return;
-
-      const deltaX = e.clientX - stickyDragState.startPos.x;
-      const deltaY = e.clientY - stickyDragState.startPos.y;
-
-      const newPosition = {
-        x: stickyDragState.startStickyPos.x + deltaX,
-        y: stickyDragState.startStickyPos.y + deltaY,
-      };
-
-      const constrainedPosition = {
-        x: Math.max(0, Math.min(newPosition.x, window.innerWidth - 256)),
-        y: Math.max(
-          MENU_BAR_HEIGHT,
-          Math.min(newPosition.y, window.innerHeight - DOCK_HEIGHT - 288)
-        ),
-      };
-
-      setStickies(
-        stickies.map((s) =>
-          s.id === stickyDragState.stickyId
-            ? { ...s, position: constrainedPosition }
-            : s
-        )
-      );
-    },
-    [stickyDragState, stickies, isMobile]
-  );
-
-  const handleStickyMouseUp = useCallback(() => {
-    if (isMobile) return;
-
-    setStickyDragState({
-      isDragging: false,
-      stickyId: null,
-      startPos: { x: 0, y: 0 },
-      startStickyPos: { x: 0, y: 0 },
-    });
-  }, [isMobile]);
-
   const handleMouseUp = useCallback(() => {
     if (isMobile) return;
 
@@ -697,177 +298,6 @@ const MacOSPortfolio = () => {
       startWindowPos: { x: 0, y: 0 },
     });
   }, [isMobile]);
-
-  const handleIconMouseUp = useCallback(() => {
-    if (isMobile) return;
-
-    setIconDragState({
-      isDragging: false,
-      iconId: null,
-      startPos: { x: 0, y: 0 },
-      startIconPos: { x: 0, y: 0 },
-    });
-
-    setTimeout(() => {
-      setHasDraggedIcon(false);
-    }, 100);
-  }, [isMobile]);
-
-  const handleIconClick = useCallback(
-    (e: React.MouseEvent, iconId: string) => {
-      if (isMobile) return; // Disable desktop icons on mobile
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      if (hasDraggedIcon) return;
-
-      bringIconToFront(iconId);
-
-      const currentTime = Date.now();
-      const isDoubleClick =
-        currentTime - lastClickTime < 500 && selectedIcon === iconId;
-
-      if (isDoubleClick) {
-        dockItemClick(iconId);
-        setSelectedIcon(null);
-      } else {
-        setSelectedIcon(iconId);
-        setLastClickTime(currentTime);
-      }
-    },
-    [hasDraggedIcon, lastClickTime, selectedIcon, bringIconToFront, isMobile]
-  );
-
-  useEffect(() => {
-    const handleDocumentClick = () => {
-      if (!isMobile) {
-        setSelectedIcon(null);
-      }
-    };
-
-    document.addEventListener('click', handleDocumentClick);
-    return () => document.removeEventListener('click', handleDocumentClick);
-  }, [isMobile]);
-
-  const handleIconMouseDown = useCallback(
-    (e: React.MouseEvent, iconId: string) => {
-      if (isMobile) return; // Disable desktop icons on mobile
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      const currentPos = desktopIconPositions[iconId];
-      if (!currentPos) return;
-
-      bringIconToFront(iconId);
-
-      setHasDraggedIcon(false);
-
-      setIconDragState({
-        isDragging: false,
-        iconId,
-        startPos: { x: e.clientX, y: e.clientY },
-        startIconPos: currentPos,
-      });
-    },
-    [desktopIconPositions, bringIconToFront, isMobile]
-  );
-
-  useEffect(() => {
-    if (!isMobile && dragState.isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-      };
-    }
-  }, [dragState.isDragging, handleMouseMove, handleMouseUp, isMobile]);
-
-  useEffect(() => {
-    if (!isMobile && iconDragState.iconId) {
-      document.addEventListener('mousemove', handleIconMouseMove);
-      document.addEventListener('mouseup', handleIconMouseUp);
-
-      return () => {
-        document.removeEventListener('mousemove', handleIconMouseMove);
-        document.removeEventListener('mouseup', handleIconMouseUp);
-      };
-    }
-  }, [
-    iconDragState.iconId,
-    iconDragState.isDragging,
-    handleIconMouseMove,
-    handleIconMouseUp,
-    isMobile,
-  ]);
-
-  // 스티키 드래그 이벤트 리스너
-  useEffect(() => {
-    if (!isMobile && stickyDragState.isDragging) {
-      document.addEventListener('mousemove', handleStickyMouseMove);
-      document.addEventListener('mouseup', handleStickyMouseUp);
-
-      return () => {
-        document.removeEventListener('mousemove', handleStickyMouseMove);
-        document.removeEventListener('mouseup', handleStickyMouseUp);
-      };
-    }
-  }, [
-    stickyDragState.isDragging,
-    handleStickyMouseMove,
-    handleStickyMouseUp,
-    isMobile,
-  ]);
-
-  // Dock hover animation effect - Only tooltip, no scaling (desktop only)
-  useEffect(() => {
-    if (isMobile) return;
-
-    const dockItems = document.querySelectorAll('.dock-item');
-
-    dockItems.forEach((item) => {
-      const tooltip = item.querySelector('.tooltip') as HTMLElement;
-
-      item.addEventListener('mouseenter', () => {
-        if (tooltip) {
-          tooltip.style.opacity = '0.8';
-          tooltip.style.transform = 'translateY(0px) translateX(-50%)';
-        }
-      });
-
-      item.addEventListener('mouseleave', () => {
-        if (tooltip) {
-          tooltip.style.opacity = '0';
-          tooltip.style.transform = 'translateY(10px) translateX(-50%)';
-        }
-      });
-    });
-
-    const dockContainer = document.querySelector('.fixed.bottom-2');
-    if (dockContainer) {
-      dockContainer.addEventListener('mouseleave', () => {
-        const allTooltips = document.querySelectorAll('.tooltip');
-        allTooltips.forEach((tooltip) => {
-          const tooltipEl = tooltip as HTMLElement;
-          tooltipEl.style.opacity = '0';
-          tooltipEl.style.transform = 'translateY(10px) translateX(-50%)';
-        });
-      });
-    }
-
-    return () => {
-      dockItems.forEach((item) => {
-        item.removeEventListener('mouseenter', () => {});
-        item.removeEventListener('mouseleave', () => {});
-      });
-      if (dockContainer) {
-        dockContainer.removeEventListener('mouseleave', () => {});
-      }
-    };
-  }, [dockItems, isMobile]);
 
   const handleResizeMouseDown = useCallback(
     (e: React.MouseEvent, windowId: string, direction: string) => {
@@ -890,7 +320,6 @@ const MacOSPortfolio = () => {
     [windows, isMobile]
   );
 
-  // Updated handleResizeMouseMove with dock constraints (desktop only)
   const handleResizeMouseMove = useCallback(
     (e: MouseEvent) => {
       if (isMobile || !resizeState.isResizing || !resizeState.windowId) return;
@@ -1019,6 +448,188 @@ const MacOSPortfolio = () => {
     isMobile,
   ]);
 
+  // Window drag event listeners
+  useEffect(() => {
+    if (!isMobile && dragState.isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [dragState.isDragging, handleMouseMove, handleMouseUp, isMobile]);
+
+  // Icon drag handlers
+  const handleIconMouseDown = useCallback(
+    (e: React.MouseEvent, iconId: string, currentPos: Position) => {
+      if (isMobile) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      setHasDraggedIcon(false);
+
+      setIconDragState({
+        isDragging: false,
+        iconId,
+        startPos: { x: e.clientX, y: e.clientY },
+        startIconPos: currentPos,
+      });
+    },
+    [isMobile]
+  );
+
+  const handleIconMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (isMobile) return;
+
+      if (!iconDragState.isDragging && iconDragState.iconId) {
+        const deltaX = e.clientX - iconDragState.startPos.x;
+        const deltaY = e.clientY - iconDragState.startPos.y;
+        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+
+        if (distance > 5) {
+          setIconDragState((prev) => ({ ...prev, isDragging: true }));
+          setHasDraggedIcon(true);
+        }
+        return;
+      }
+
+      if (!iconDragState.isDragging || !iconDragState.iconId) return;
+
+      const deltaX = e.clientX - iconDragState.startPos.x;
+      const deltaY = e.clientY - iconDragState.startPos.y;
+
+      const newPosition = {
+        x: iconDragState.startIconPos.x + deltaX,
+        y: iconDragState.startIconPos.y + deltaY,
+      };
+
+      const constrainedPosition = {
+        x: Math.max(32, Math.min(newPosition.x, window.innerWidth - 32)),
+        y: Math.max(72, Math.min(newPosition.y, window.innerHeight - 70 - 32)),
+      };
+
+      setDesktopIconPositions((prev: Record<string, Position>) => ({
+        ...prev,
+        [iconDragState.iconId!]: constrainedPosition,
+      }));
+    },
+    [iconDragState, isMobile]
+  );
+
+  const handleIconMouseUp = useCallback(() => {
+    if (isMobile) return;
+
+    setIconDragState({
+      isDragging: false,
+      iconId: null,
+      startPos: { x: 0, y: 0 },
+      startIconPos: { x: 0, y: 0 },
+    });
+
+    setTimeout(() => {
+      setHasDraggedIcon(false);
+    }, 100);
+  }, [isMobile]);
+
+  // Icon drag event listeners
+  useEffect(() => {
+    if (!isMobile && iconDragState.iconId) {
+      document.addEventListener('mousemove', handleIconMouseMove);
+      document.addEventListener('mouseup', handleIconMouseUp);
+
+      return () => {
+        document.removeEventListener('mousemove', handleIconMouseMove);
+        document.removeEventListener('mouseup', handleIconMouseUp);
+      };
+    }
+  }, [
+    iconDragState.iconId,
+    iconDragState.isDragging,
+    handleIconMouseMove,
+    handleIconMouseUp,
+    isMobile,
+  ]);
+
+  // Sticky drag handlers
+  const handleStickyMouseDown = useCallback(
+    (e: React.MouseEvent, stickyId: string, stickyPosition: Position) => {
+      if (isMobile) return;
+
+      e.preventDefault();
+      e.stopPropagation();
+
+      setStickyDragState({
+        isDragging: true,
+        stickyId,
+        startPos: { x: e.clientX, y: e.clientY },
+        startStickyPos: stickyPosition,
+      });
+    },
+    [isMobile]
+  );
+
+  const handleStickyMouseMove = useCallback(
+    (e: MouseEvent) => {
+      if (isMobile || !stickyDragState.isDragging || !stickyDragState.stickyId)
+        return;
+
+      const deltaX = e.clientX - stickyDragState.startPos.x;
+      const deltaY = e.clientY - stickyDragState.startPos.y;
+
+      const newPosition = {
+        x: stickyDragState.startStickyPos.x + deltaX,
+        y: stickyDragState.startStickyPos.y + deltaY,
+      };
+
+      const constrainedPosition = {
+        x: Math.max(0, Math.min(newPosition.x, window.innerWidth - 256)),
+        y: Math.max(40, Math.min(newPosition.y, window.innerHeight - 70 - 288)),
+      };
+
+      setStickies(
+        stickies.map((s) =>
+          s.id === stickyDragState.stickyId
+            ? { ...s, position: constrainedPosition }
+            : s
+        )
+      );
+    },
+    [stickyDragState, stickies, isMobile]
+  );
+
+  const handleStickyMouseUp = useCallback(() => {
+    if (isMobile) return;
+
+    setStickyDragState({
+      isDragging: false,
+      stickyId: null,
+      startPos: { x: 0, y: 0 },
+      startStickyPos: { x: 0, y: 0 },
+    });
+  }, [isMobile]);
+
+  // Sticky drag event listeners
+  useEffect(() => {
+    if (!isMobile && stickyDragState.isDragging) {
+      document.addEventListener('mousemove', handleStickyMouseMove);
+      document.addEventListener('mouseup', handleStickyMouseUp);
+
+      return () => {
+        document.removeEventListener('mousemove', handleStickyMouseMove);
+        document.removeEventListener('mouseup', handleStickyMouseUp);
+      };
+    }
+  }, [
+    stickyDragState.isDragging,
+    handleStickyMouseMove,
+    handleStickyMouseUp,
+    isMobile,
+  ]);
+
   const dockItemClick = (itemId: string) => {
     const existingWindow = windows.find((w) => w.id === itemId);
     if (existingWindow && existingWindow.isMinimized && !isMobile) {
@@ -1036,7 +647,15 @@ const MacOSPortfolio = () => {
       bringToFront(itemId);
     } else {
       // Open new window
-      openWindow(itemId);
+      const dockItem = dockItems.find((item) => item.id === itemId);
+      if (dockItem) {
+        openWindow(itemId, dockItem, getWindowContent);
+      }
+    }
+
+    // Update URL when window is opened
+    if (window.history) {
+      window.history.pushState({}, '', `/${itemId}`);
     }
   };
 
@@ -1060,7 +679,10 @@ const MacOSPortfolio = () => {
         <Stickies
           key={sticky.id}
           sticky={sticky}
-          onMouseDown={handleStickyMouseDown}
+          onMouseDown={(e) => {
+            e.stopPropagation();
+            handleStickyMouseDown(e, sticky.id, sticky.position);
+          }}
           isMobile={isMobile}
         />
       ))}
@@ -1075,6 +697,7 @@ const MacOSPortfolio = () => {
             transition: 'filter 0.5s ease-in-out',
             opacity: imageLoaded ? 1 : 0,
             transitionDelay: imageLoaded ? '0.5s' : '0s',
+            zIndex: 0,
           }}
           onLoad={() => setImageLoaded(true)}
         >
@@ -1094,8 +717,11 @@ const MacOSPortfolio = () => {
                   position={iconPos}
                   isSelected={isSelected}
                   isDragging={isDragging}
-                  onMouseDown={handleIconMouseDown}
-                  onClick={handleIconClick}
+                  onMouseDown={(e) => handleIconMouseDown(e, item.id, iconPos)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleIconClick(e, item.id, hasDraggedIcon, dockItemClick);
+                  }}
                 />
               );
             })}
@@ -1105,18 +731,21 @@ const MacOSPortfolio = () => {
       {windows
         .filter((w) => w.isOpen)
         .sort((a, b) => a.zIndex - b.zIndex)
-        .map((window) => (
-          <Window
-            key={window.id}
-            window={window}
-            onMouseDown={handleMouseDown}
-            onClose={closeWindow}
-            onMinimize={minimizeWindow}
-            onMaximize={maximizeWindow}
-            onResizeMouseDown={handleResizeMouseDown}
-            isMobile={isMobile}
-          />
-        ))}
+        .map((window) => {
+          return (
+            <div key={window.id} style={{ zIndex: window.zIndex + 1000 }}>
+              <Window
+                window={window}
+                onMouseDown={handleWindowMouseDown}
+                onClose={closeWindow}
+                onMinimize={minimizeWindow}
+                onMaximize={maximizeWindow}
+                onResizeMouseDown={handleResizeMouseDown}
+                isMobile={isMobile}
+              />
+            </div>
+          );
+        })}
 
       <Dock
         dockItems={dockItems}
@@ -1128,4 +757,14 @@ const MacOSPortfolio = () => {
   );
 };
 
-export default MacOSPortfolio;
+const App = () => {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/*" element={<MacOSPortfolio />} />
+      </Routes>
+    </Router>
+  );
+};
+
+export default App;

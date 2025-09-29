@@ -1,5 +1,5 @@
 import React from 'react';
-import type { DockItem, Position } from '../types';
+import type { DockItem, Position } from '../../types';
 
 interface DesktopIconProps {
   item: DockItem;

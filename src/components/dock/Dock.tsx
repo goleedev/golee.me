@@ -1,7 +1,7 @@
-import type { DockItem, WindowState } from '../types';
-import FolderIcon from './FolderIcon';
-import MusicIcon from './MusicIcon';
-import NoteIcon from './NoteIcon';
+import type { DockItem, WindowState } from '../../types';
+import FolderIcon from '../shared/icons/FolderIcon';
+import MusicIcon from '../shared/icons/MusicIcon';
+import NoteIcon from '../shared/icons/NoteIcon';
 
 // Icon Component - Folder style with consistent colors
 const createIconComponent = (itemId: string) => {
