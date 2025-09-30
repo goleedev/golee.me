@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import type { StickyState } from '../../types';
 
 interface MetricsData {
-  visitors: number;
-  pageViews: number;
-  countries: number;
-  lastVisitor: string;
+  todaysViews: number;
+  totalViews: number;
+  totalCountries: number;
   topCountry: string;
+  lastVisitor: string;
 }
 
 interface StickiesProps {
@@ -17,20 +17,18 @@ interface StickiesProps {
 
 const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
   const [metrics, setMetrics] = useState<MetricsData>({
-    visitors: 0,
-    pageViews: 0,
-    countries: 0,
-    lastVisitor: '',
+    todaysViews: 0,
+    totalViews: 0,
+    totalCountries: 0,
     topCountry: '',
+    lastVisitor: '',
   });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Pages Functions API로 데이터 가져오기
   const fetchMetrics = async () => {
     try {
       setIsLoading(true);
 
-      // Pages Functions API 호출
       const response = await fetch('/api/analytics', {
         method: 'GET',
         headers: {
@@ -44,19 +42,26 @@ const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
 
       const result = await response.json();
 
-      if (!result.success) {
-        throw new Error(result.error || 'API call failed');
+      if (result.success) {
+        setMetrics(result.data);
+      } else {
+        console.error('Failed to fetch analytics:', result.error);
+        setMetrics({
+          todaysViews: 0,
+          totalViews: 0,
+          totalCountries: 0,
+          topCountry: '--',
+          lastVisitor: '--',
+        });
       }
-
-      setMetrics(result.data);
     } catch (error) {
-      // API 실패 시 기본값 설정
+      console.error('Analytics Error:', error);
       setMetrics({
-        visitors: 0,
-        pageViews: 0,
-        countries: 0,
-        lastVisitor: '--',
+        todaysViews: 0,
+        totalViews: 0,
+        totalCountries: 0,
         topCountry: '--',
+        lastVisitor: '--',
       });
     } finally {
       setIsLoading(false);
@@ -66,7 +71,6 @@ const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
   useEffect(() => {
     fetchMetrics();
 
-    // 5분마다 업데이트
     const interval = setInterval(fetchMetrics, 5 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
@@ -80,32 +84,28 @@ const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
         zIndex: sticky.zIndex,
         backgroundColor: '#fef08a',
         fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
-        cursor: isMobile ? 'default' : 'move', // Remove cursor move on mobile
+        cursor: isMobile ? 'default' : 'move',
       }}
-      onMouseDown={(e) => !isMobile && onMouseDown(e, sticky.id)} // Disable drag on mobile
+      onMouseDown={(e) => !isMobile && onMouseDown(e, sticky.id)}
     >
       <div className="text-xs leading-relaxed pointer-events-none">
-        <span className="font-semibold">🔍 Site Analytics</span>
+        <span className="font-semibold">🔍 Analytics</span>
         <br />
         <br />
         {isLoading ? (
           <div className="h-[78px] flex items-center">Loading...</div>
         ) : (
           <>
-            Today's visitors: {metrics.visitors.toLocaleString() || '--'}
-            <br />
-            Total page views: {metrics.pageViews.toLocaleString() || '--'}
-            <br />
-            Countries: {metrics.countries || '--'}
-            <br />
-            Top country: {metrics.topCountry || '--'}
-            <br />
-            Last visitor: {metrics.lastVisitor || '--'}
+            · Today's views: {metrics.todaysViews.toLocaleString() || '--'}
+            <br />· Total views: {metrics.totalViews.toLocaleString() || '--'}
+            <br />· Total countries: {metrics.totalCountries || '--'}
+            <br />· Top country: {metrics.topCountry || '--'}
+            <br />· Last visitor: {metrics.lastVisitor || '--'}
           </>
         )}
         <br />
         <br />
-        Powered by Cloudflare Analytics
+        Powered by Cloudflare D1
       </div>
     </div>
   );

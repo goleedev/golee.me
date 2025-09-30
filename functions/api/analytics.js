@@ -1,205 +1,211 @@
-const countryCodeToName = {
-  US: 'United States',
-  KR: 'South Korea',
-  GB: 'United Kingdom',
-  CA: 'Canada',
-  AU: 'Australia',
-  DE: 'Germany',
-  FR: 'France',
-  JP: 'Japan',
-  CN: 'China',
-  IN: 'India',
-  BR: 'Brazil',
-  MX: 'Mexico',
-  IT: 'Italy',
-  ES: 'Spain',
-  NL: 'Netherlands',
-  SE: 'Sweden',
-  NO: 'Norway',
-  DK: 'Denmark',
-  FI: 'Finland',
-  BE: 'Belgium',
-  CH: 'Switzerland',
-  AT: 'Austria',
-  IE: 'Ireland',
-  PT: 'Portugal',
-  PL: 'Poland',
-  RU: 'Russia',
-  TR: 'Turkey',
-  IL: 'Israel',
-  AE: 'United Arab Emirates',
-  SG: 'Singapore',
-  HK: 'Hong Kong',
-  TW: 'Taiwan',
-  TH: 'Thailand',
-  VN: 'Vietnam',
-  MY: 'Malaysia',
-  ID: 'Indonesia',
-  PH: 'Philippines',
-  NZ: 'New Zealand',
-  ZA: 'South Africa',
-  EG: 'Egypt',
-  AR: 'Argentina',
-  CL: 'Chile',
-  CO: 'Colombia',
-  PE: 'Peru',
-};
-
+// functions/api/analytics.js
 export async function onRequest(context) {
   const { request, env } = context;
 
-  // CORS 헤더 설정
   const corsHeaders = {
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   };
 
-  // OPTIONS 요청 처리 (CORS preflight)
   if (request.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 200,
-      headers: corsHeaders,
-    });
-  }
-
-  // GET 요청만 처리
-  if (request.method !== 'GET') {
-    return new Response('Method not allowed', {
-      status: 405,
-      headers: corsHeaders,
-    });
+    return new Response(null, { status: 200, headers: corsHeaders });
   }
 
   try {
-    // 환경변수에서 토큰과 Account ID 가져오기
-    const API_TOKEN = env.CLOUDFLARE_API_TOKEN;
-    const ACCOUNT_ID = env.CLOUDFLARE_ACCOUNT_ID;
-
-    if (!API_TOKEN || !ACCOUNT_ID) {
-      console.error('Missing environment variables');
+    if (!env.DB) {
       return new Response(
         JSON.stringify({
-          error: 'API credentials not configured',
+          success: false,
+          error: 'D1 database not bound',
         }),
         {
           status: 500,
-          headers: {
-            'Content-Type': 'application/json',
-            ...corsHeaders,
-          },
+          headers: { 'Content-Type': 'application/json', ...corsHeaders },
         }
       );
     }
 
-    // 24시간 전부터 현재까지 필터
-    const now = new Date();
-    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    // POST - Track visit
+    if (request.method === 'POST') {
+      try {
+        const body = await request.json();
+        const { country, referrer } = body;
+        const userAgent = request.headers.get('User-Agent') || 'unknown';
+        const timestamp = new Date().toISOString();
 
-    // Cloudflare Analytics API 호출
-    const response = await fetch(
-      'https://api.cloudflare.com/client/v4/graphql',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${API_TOKEN}`,
-        },
-        body: JSON.stringify({
-          query: `
-          query WebAnalytics($accountTag: String!, $filter: RumPageloadEventsAdaptiveFilter) {
-            viewer {
-              accounts(filter: {accountTag: $accountTag}) {
-                rumPageloadEventsAdaptiveGroups(
-                  filter: $filter
-                  limit: 1000
-                  orderBy: [datetimeHour_DESC]
-                ) {
-                  count
-                  sum {
-                    visits
-                  }
-                  dimensions {
-                    datetimeHour
-                    countryName
-                  }
-                }
-              }
-            }
-          }`,
-          variables: {
-            accountTag: ACCOUNT_ID,
-            filter: {
-              datetime_geq: yesterday.toISOString(),
-              datetime_leq: now.toISOString(),
-              bot: 0,
+        // Create analytics table if not exists (IP 제거)
+        await env.DB.prepare(
+          `
+          CREATE TABLE IF NOT EXISTS analytics_visits (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            country TEXT,
+            referrer TEXT,
+            user_agent TEXT,
+            visited_at TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+          )
+        `
+        ).run();
+
+        // Insert visit (IP 없이)
+        await env.DB.prepare(
+          `
+          INSERT INTO analytics_visits (country, referrer, user_agent, visited_at)
+          VALUES (?, ?, ?, ?)
+        `
+        )
+          .bind(
+            country || 'Unknown',
+            referrer || 'Direct',
+            userAgent,
+            timestamp
+          )
+          .run();
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: 'Visit tracked',
+          }),
+          {
+            headers: { 'Content-Type': 'application/json', ...corsHeaders },
+          }
+        );
+      } catch (error) {
+        console.error('Error tracking visit:', error);
+        return new Response(
+          JSON.stringify({
+            success: false,
+            error: error.message,
+          }),
+          {
+            status: 500,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders },
+          }
+        );
+      }
+    }
+
+    // GET - Get analytics data
+    if (request.method === 'GET') {
+      try {
+        // Ensure table exists
+        await env.DB.prepare(
+          `
+          CREATE TABLE IF NOT EXISTS analytics_visits (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            country TEXT,
+            referrer TEXT,
+            user_agent TEXT,
+            visited_at TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP
+          )
+        `
+        ).run();
+
+        // Get today's views
+        const today = new Date().toISOString().split('T')[0];
+        const todayViews = await env.DB.prepare(
+          `
+          SELECT COUNT(*) as count 
+          FROM analytics_visits 
+          WHERE DATE(visited_at) = ?
+        `
+        )
+          .bind(today)
+          .first();
+
+        // Get total pageviews (all visits)
+        const totalViews = await env.DB.prepare(
+          `
+          SELECT COUNT(*) as count FROM analytics_visits
+        `
+        ).first();
+
+        // Get countries
+        const countries = await env.DB.prepare(
+          `
+          SELECT country, COUNT(*) as count 
+          FROM analytics_visits 
+          WHERE country != 'Unknown'
+          GROUP BY country 
+          ORDER BY count DESC
+        `
+        ).all();
+
+        // Get last visit
+        const lastVisit = await env.DB.prepare(
+          `
+          SELECT visited_at FROM analytics_visits 
+          ORDER BY visited_at DESC 
+          LIMIT 1
+        `
+        ).first();
+
+        // Calculate last visitor time
+        let lastVisitorTime = '--';
+        if (lastVisit?.visited_at) {
+          const lastVisitDate = new Date(lastVisit.visited_at);
+          const now = new Date();
+          const diffMs = now.getTime() - lastVisitDate.getTime();
+          const diffMins = Math.floor(diffMs / 60000);
+
+          if (diffMins < 1) {
+            lastVisitorTime = 'just now';
+          } else if (diffMins < 60) {
+            lastVisitorTime = `${diffMins}m ago`;
+          } else if (diffMins < 1440) {
+            lastVisitorTime = `${Math.floor(diffMins / 60)}h ago`;
+          } else {
+            lastVisitorTime = `${Math.floor(diffMins / 1440)}d ago`;
+          }
+        }
+
+        const totalCountries = countries.results?.length || 0;
+        const topCountry = countries.results?.[0]?.country || '--';
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              todaysViews: todayViews?.count || 0,
+              totalViews: totalViews?.count || 0,
+              totalCountries: totalCountries,
+              topCountry: topCountry,
+              lastVisitor: lastVisitorTime,
             },
-          },
-        }),
+          }),
+          {
+            headers: { 'Content-Type': 'application/json', ...corsHeaders },
+          }
+        );
+      } catch (error) {
+        console.error('Error fetching analytics:', error);
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              todaysViews: 0,
+              totalViews: 0,
+              totalCountries: 0,
+              topCountry: '--',
+              lastVisitor: '--',
+            },
+            error: error.message,
+          }),
+          {
+            headers: { 'Content-Type': 'application/json', ...corsHeaders },
+          }
+        );
       }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Cloudflare API error: ${response.status}`);
     }
 
-    const data = await response.json();
-
-    if (data.errors) {
-      console.error('GraphQL errors:', data.errors);
-      throw new Error('GraphQL query failed');
-    }
-
-    const rawData =
-      data.data?.viewer?.accounts?.[0]?.rumPageloadEventsAdaptiveGroups || [];
-
-    // 데이터 처리
-    const totalVisits = rawData.reduce((sum, item) => sum + item.sum.visits, 0);
-    const totalPageViews = rawData.reduce((sum, item) => sum + item.count, 0);
-
-    // 국가별 집계 (풀네임으로 변환)
-    const countries = {};
-    rawData.forEach((item) => {
-      const countryCode = item.dimensions.countryName;
-      if (countryCode && countryCode !== 'Unknown') {
-        // 국가 코드를 풀네임으로 변환
-        const countryName = countryCodeToName[countryCode] || countryCode;
-        countries[countryName] =
-          (countries[countryName] || 0) + item.sum.visits;
-      }
+    return new Response('Method not allowed', {
+      status: 405,
+      headers: corsHeaders,
     });
-
-    const topCountry =
-      Object.entries(countries).sort(([, a], [, b]) => b - a)[0]?.[0] ||
-      'Unknown';
-
-    // 마지막 방문 시간 계산
-    const lastVisit = rawData[0]?.dimensions?.datetimeHour;
-    const lastVisitor = lastVisit ? getTimeAgo(new Date(lastVisit)) : 'Unknown';
-
-    const processedData = {
-      visitors: totalVisits,
-      pageViews: totalPageViews,
-      countries: Object.keys(countries).length,
-      topCountry,
-      lastVisitor,
-    };
-
-    return new Response(
-      JSON.stringify({
-        success: true,
-        data: processedData,
-      }),
-      {
-        headers: {
-          'Content-Type': 'application/json',
-          ...corsHeaders,
-        },
-      }
-    );
   } catch (error) {
-    console.error('Analytics API Error:', error);
-
     return new Response(
       JSON.stringify({
         success: false,
@@ -207,27 +213,8 @@ export async function onRequest(context) {
       }),
       {
         status: 500,
-        headers: {
-          'Content-Type': 'application/json',
-          ...corsHeaders,
-        },
+        headers: { 'Content-Type': 'application/json', ...corsHeaders },
       }
     );
   }
-}
-
-// 상대 시간 계산 헬퍼 함수
-function getTimeAgo(date) {
-  const now = new Date();
-  const diffMs = now.getTime() - date.getTime();
-  const diffMins = Math.floor(diffMs / (1000 * 60));
-
-  if (diffMins < 1) return 'Just now';
-  if (diffMins < 60) return `${diffMins} min${diffMins > 1 ? 's' : ''} ago`;
-
-  const diffHours = Math.floor(diffMins / 60);
-  if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
-
-  const diffDays = Math.floor(diffHours / 24);
-  return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
 }
