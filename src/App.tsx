@@ -99,12 +99,14 @@ const MacOSPortfolio = () => {
     direction: string;
     startPos: Position;
     startSize: Size;
+    startWindowPos: Position;
   }>({
     isResizing: false,
     windowId: null,
     direction: '',
     startPos: { x: 0, y: 0 },
     startSize: { width: 0, height: 0 },
+    startWindowPos: { x: 0, y: 0 },
   });
 
   const desktopRef = useRef<HTMLDivElement>(null);
@@ -315,6 +317,7 @@ const MacOSPortfolio = () => {
         direction,
         startPos: { x: e.clientX, y: e.clientY },
         startSize: window.size,
+        startWindowPos: window.position,
       });
     },
     [windows, isMobile]
@@ -334,7 +337,7 @@ const MacOSPortfolio = () => {
         if (!window) return;
 
         const newSize = { ...resizeState.startSize };
-        const newPosition = { ...window.position };
+        const newPosition = { ...resizeState.startWindowPos };
 
         switch (resizeState.direction) {
           case 'se':
@@ -351,7 +354,8 @@ const MacOSPortfolio = () => {
               resizeState.startSize.height + deltaY
             );
             newPosition.x =
-              window.position.x + (resizeState.startSize.width - newSize.width);
+              resizeState.startWindowPos.x +
+              (resizeState.startSize.width - newSize.width);
             break;
           case 'ne':
             newSize.width = Math.max(300, resizeState.startSize.width + deltaX);
@@ -360,7 +364,7 @@ const MacOSPortfolio = () => {
               resizeState.startSize.height - deltaY
             );
             newPosition.y =
-              window.position.y +
+              resizeState.startWindowPos.y +
               (resizeState.startSize.height - newSize.height);
             break;
           case 'nw':
@@ -370,9 +374,10 @@ const MacOSPortfolio = () => {
               resizeState.startSize.height - deltaY
             );
             newPosition.x =
-              window.position.x + (resizeState.startSize.width - newSize.width);
+              resizeState.startWindowPos.x +
+              (resizeState.startSize.width - newSize.width);
             newPosition.y =
-              window.position.y +
+              resizeState.startWindowPos.y +
               (resizeState.startSize.height - newSize.height);
             break;
           case 'n':
@@ -381,7 +386,7 @@ const MacOSPortfolio = () => {
               resizeState.startSize.height - deltaY
             );
             newPosition.y =
-              window.position.y +
+              resizeState.startWindowPos.y +
               (resizeState.startSize.height - newSize.height);
             break;
           case 's':
@@ -396,7 +401,8 @@ const MacOSPortfolio = () => {
           case 'w':
             newSize.width = Math.max(300, resizeState.startSize.width - deltaX);
             newPosition.x =
-              window.position.x + (resizeState.startSize.width - newSize.width);
+              resizeState.startWindowPos.x +
+              (resizeState.startSize.width - newSize.width);
             break;
         }
 
@@ -428,6 +434,7 @@ const MacOSPortfolio = () => {
       direction: '',
       startPos: { x: 0, y: 0 },
       startSize: { width: 0, height: 0 },
+      startWindowPos: { x: 0, y: 0 },
     });
   }, [isMobile]);
 

@@ -46,8 +46,7 @@ export const useWindowManagement = (isMobile: boolean) => {
         window.innerHeight -
         MENU_BAR_HEIGHT -
         DOCK_HEIGHT -
-        position.y +
-        MENU_BAR_HEIGHT;
+        (position.y - MENU_BAR_HEIGHT);
 
       return {
         width: Math.min(Math.max(300, size.width), maxWidth),
