@@ -1,6 +1,7 @@
 // Layout constants
 export const MENU_BAR_HEIGHT = 40;
-export const DOCK_HEIGHT = 70;
+export const DOCK_HEIGHT_DESKTOP = 64;
+export const DOCK_HEIGHT_MOBILE = 70;
 export const WINDOW_MARGIN = 0;
 
 // Responsive breakpoints
@@ -16,28 +17,25 @@ export const shouldAutoMaximize = () => {
 };
 
 // Window size configurations
-export const WINDOW_SIZES = {
+export const getWindowSizes = (dockHeight: number) => ({
   default: { width: 600, height: 500 },
   music: { width: 300, height: 500 },
   mobile: {
     width: window.innerWidth,
-    height: window.innerHeight - MENU_BAR_HEIGHT - DOCK_HEIGHT,
+    height: window.innerHeight - MENU_BAR_HEIGHT - dockHeight,
   },
-} as const;
+});
 
 // Icon positions for bagel layout
 export const getBagelIconPositions = (centerX: number, centerY: number) => {
-  // Calculate responsive radius based on screen size
   const screenWidth = window.innerWidth;
   const screenHeight = window.innerHeight;
   const minDimension = Math.min(screenWidth, screenHeight);
 
-  // Responsive radius that scales with screen size
-  // For smaller screens, make icons closer together
-  const scaleFactor = minDimension < 600 ? 0.15 : 0.21; // Closer for small screens
-  const baseRadius = Math.min(minDimension * scaleFactor, 200); // Cap at 200px
-  const radiusX = Math.max(baseRadius, 60); // Minimum 60px for very small screens
-  const radiusY = Math.max(baseRadius * 1.05, 65); // Slightly larger Y radius
+  const scaleFactor = minDimension < 600 ? 0.15 : 0.21;
+  const baseRadius = Math.min(minDimension * scaleFactor, 200);
+  const radiusX = Math.max(baseRadius, 60);
+  const radiusY = Math.max(baseRadius * 1.05, 65);
 
   return {
     about: {

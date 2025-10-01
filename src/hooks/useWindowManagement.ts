@@ -2,15 +2,16 @@ import { useCallback, useState, useEffect } from 'react';
 import type { WindowState, DockItem, Position, Size } from '../types';
 import {
   MENU_BAR_HEIGHT,
-  DOCK_HEIGHT,
   WINDOW_MARGIN,
-  WINDOW_SIZES,
+  getWindowSizes,
   shouldAutoMaximize,
 } from '../data/constants';
 
-export const useWindowManagement = (isMobile: boolean) => {
+export const useWindowManagement = (isMobile: boolean, dockHeight: number) => {
   const [windows, setWindows] = useState<WindowState[]>([]);
   const [highestZIndex, setHighestZIndex] = useState(1000);
+
+  const WINDOW_SIZES = getWindowSizes(dockHeight);
 
   const constrainPosition = useCallback(
     (pos: Position, size: Size): Position => {
@@ -18,8 +19,7 @@ export const useWindowManagement = (isMobile: boolean) => {
         return { x: 0, y: MENU_BAR_HEIGHT };
       }
 
-      const availableHeight =
-        window.innerHeight - MENU_BAR_HEIGHT - DOCK_HEIGHT;
+      const availableHeight = window.innerHeight - MENU_BAR_HEIGHT - dockHeight;
 
       return {
         x: Math.max(
@@ -32,7 +32,7 @@ export const useWindowManagement = (isMobile: boolean) => {
         ),
       };
     },
-    [isMobile]
+    [isMobile, dockHeight]
   );
 
   const constrainSize = useCallback(
@@ -45,7 +45,7 @@ export const useWindowManagement = (isMobile: boolean) => {
       const maxHeight =
         window.innerHeight -
         MENU_BAR_HEIGHT -
-        DOCK_HEIGHT -
+        dockHeight -
         (position.y - MENU_BAR_HEIGHT);
 
       return {
@@ -53,7 +53,7 @@ export const useWindowManagement = (isMobile: boolean) => {
         height: Math.min(Math.max(200, size.height), maxHeight),
       };
     },
-    [isMobile]
+    [isMobile, dockHeight, WINDOW_SIZES]
   );
 
   const openWindow = useCallback(
@@ -110,14 +110,13 @@ export const useWindowManagement = (isMobile: boolean) => {
       setWindows([...windows, newWindow]);
       setHighestZIndex((prev) => prev + 1);
     },
-    [windows, highestZIndex, isMobile, constrainPosition]
+    [windows, highestZIndex, isMobile, constrainPosition, WINDOW_SIZES]
   );
 
   const closeWindow = useCallback(
     (windowId: string) => {
       setWindows(windows.filter((w) => w.id !== windowId));
 
-      // Update URL to root when window is closed
       if (window.history) {
         window.history.pushState({}, '', '/');
       }
@@ -142,8 +141,7 @@ export const useWindowManagement = (isMobile: boolean) => {
     (windowId: string) => {
       if (isMobile) return;
 
-      const availableHeight =
-        window.innerHeight - MENU_BAR_HEIGHT - DOCK_HEIGHT;
+      const availableHeight = window.innerHeight - MENU_BAR_HEIGHT - dockHeight;
 
       const newWindows = windows.map((w): WindowState => {
         if (w.id !== windowId) return w;
@@ -170,7 +168,7 @@ export const useWindowManagement = (isMobile: boolean) => {
           return {
             ...w,
             isMaximized: true,
-            wasAutoMaximized: false, // Manual maximization, not auto
+            wasAutoMaximized: false,
             originalPosition: { ...w.position },
             originalSize: { ...w.size },
             position: newPosition,
@@ -181,7 +179,7 @@ export const useWindowManagement = (isMobile: boolean) => {
 
       setWindows(newWindows);
     },
-    [windows, isMobile]
+    [windows, isMobile, dockHeight]
   );
 
   const bringToFront = useCallback(
@@ -198,21 +196,19 @@ export const useWindowManagement = (isMobile: boolean) => {
 
   // Responsive window management
   useEffect(() => {
-    const handleResize = () => {
-      if (isMobile) return;
+    if (isMobile) return;
 
+    const handleResize = () => {
       const shouldMaximize = shouldAutoMaximize();
-      const availableHeight =
-        globalThis.window.innerHeight - MENU_BAR_HEIGHT - DOCK_HEIGHT;
+      const availableHeight = window.innerHeight - MENU_BAR_HEIGHT - dockHeight;
 
       setWindows((prevWindows) =>
         prevWindows.map((window) => {
-          // If screen is small enough, auto-maximize all open windows
           if (shouldMaximize && window.isOpen && !window.isMinimized) {
             return {
               ...window,
               isMaximized: true,
-              wasAutoMaximized: true, // Mark as auto-maximized
+              wasAutoMaximized: true,
               originalPosition: window.originalPosition || window.position,
               originalSize: window.originalSize || window.size,
               position: { x: WINDOW_MARGIN, y: MENU_BAR_HEIGHT },
@@ -221,9 +217,7 @@ export const useWindowManagement = (isMobile: boolean) => {
                 height: availableHeight - WINDOW_MARGIN,
               },
             };
-          }
-          // If screen is large enough, restore original size if it was auto-maximized
-          else if (
+          } else if (
             !shouldMaximize &&
             window.isMaximized &&
             window.wasAutoMaximized &&
@@ -233,7 +227,7 @@ export const useWindowManagement = (isMobile: boolean) => {
             return {
               ...window,
               isMaximized: false,
-              wasAutoMaximized: false, // Reset auto-maximized flag
+              wasAutoMaximized: false,
               position: window.originalPosition,
               size: window.originalSize,
               originalPosition: undefined,
@@ -245,13 +239,10 @@ export const useWindowManagement = (isMobile: boolean) => {
       );
     };
 
-    // Initial check
     handleResize();
-
-    // Listen for resize events
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [isMobile]);
+  }, [isMobile, dockHeight]);
 
   return {
     windows,
