@@ -2,6 +2,8 @@ import { useCallback, useState, useEffect } from 'react';
 import type { WindowState, DockItem, Position, Size } from '../types';
 import {
   MENU_BAR_HEIGHT,
+  MIN_WINDOW_HEIGHT,
+  MIN_WINDOW_WIDTH,
   WINDOW_MARGIN,
   getWindowSizes,
   shouldAutoMaximize,
@@ -49,8 +51,8 @@ export const useWindowManagement = (isMobile: boolean, dockHeight: number) => {
         (position.y - MENU_BAR_HEIGHT);
 
       return {
-        width: Math.min(Math.max(300, size.width), maxWidth),
-        height: Math.min(Math.max(200, size.height), maxHeight),
+        width: Math.min(Math.max(MIN_WINDOW_WIDTH, size.width), maxWidth),
+        height: Math.min(Math.max(MIN_WINDOW_HEIGHT, size.height), maxHeight),
       };
     },
     [isMobile, dockHeight, WINDOW_SIZES]

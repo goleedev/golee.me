@@ -1,10 +1,7 @@
-import {
-  ExternalLink,
-  Instagram,
-  Linkedin,
-  Twitter,
-  Users,
-} from 'lucide-react';
+import { Instagram, Linkedin, Twitter, Users } from 'lucide-react';
+import { PageHeader } from '../shared/PageHeader';
+import { StatCard } from '../shared/StatCard';
+import { ExternalLink } from '../shared/ExternalLink';
 
 interface CommunityEvent {
   id: string;
@@ -48,7 +45,7 @@ export const CommunityContent = () => {
         "A special event for International Women's Day, exploring how women can embrace mistakes as stepping stones for growth, featuring four inspiring speakers.",
       image: '/community/mistakes-growth.gif',
       highlights: [
-        '2-hour virtual event celebrating International Women’s Day',
+        "2-hour virtual event celebrating International Women's Day",
         'Structured approach to learning from mistakes',
         'Raising awareness of internalized biases and redefining leadership',
       ],
@@ -101,6 +98,7 @@ export const CommunityContent = () => {
       ],
     },
   ];
+
   const getEventTypeLabel = (type: CommunityEvent['type']) => {
     switch (type) {
       case 'conference':
@@ -118,58 +116,35 @@ export const CommunityContent = () => {
     }
   };
 
+  const stats = [
+    { metric: '11.5K+', label: 'Members' },
+    { metric: 'Global', label: 'Reach' },
+    { metric: '6+', label: 'Years' },
+    { metric: '20+', label: 'Events' },
+  ];
+
   return (
-    <div className="px-8 py-8 h-full overflow-auto bg-white/95 backdrop-blur-xl">
+    <div className="px-4 sm:px-8 py-4 sm:py-8 h-full overflow-auto bg-white/95 backdrop-blur-xl">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-light mb-2 text-gray-900">
-            Community Journey
-          </h2>
-          <p className="text-gray-600 font-light">
-            Building and empowering the women in tech community since 2019
-          </p>
-        </div>
+        <PageHeader
+          title="Community Journey"
+          subtitle="Building and empowering the women in tech community since 2019"
+        />
 
         {/* Current Stats */}
-        <div className="border-t border-gray-200 pt-8 pb-8">
-          <h3 className="text-lg font-medium text-gray-900 mb-6">
+        <div className="border-t border-gray-200 pt-6 sm:pt-8 pb-6 sm:pb-8">
+          <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-4 sm:mb-6">
             DefyDefault Today
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div>
-              <div className="text-2xl font-light text-gray-700 mb-1">
-                11.5K+
-              </div>
-              <div className="text-xs text-gray-500 uppercase tracking-wide">
-                Members
-              </div>
-            </div>
-            <div>
-              <div className="text-2xl font-light text-gray-700 mb-1">
-                Global
-              </div>
-              <div className="text-xs text-gray-500 uppercase tracking-wide">
-                Reach
-              </div>
-            </div>
-            <div>
-              <div className="text-2xl font-light text-gray-700 mb-1">6+</div>
-              <div className="text-xs text-gray-500 uppercase tracking-wide">
-                Years
-              </div>
-            </div>
-            <div>
-              <div className="text-2xl font-light text-gray-700 mb-1">20+</div>
-              <div className="text-xs text-gray-500 uppercase tracking-wide">
-                Events
-              </div>
-            </div>
+          <div className="grid grid-cols-2 gap-3 sm:gap-4 md:gap-6">
+            {stats.map((stat, index) => (
+              <StatCard key={index} metric={stat.metric} label={stat.label} />
+            ))}
           </div>
         </div>
 
         {/* Events Timeline */}
-        <div className="space-y-12">
+        <div className="space-y-8 sm:space-y-12">
           {events.map((event, index) => (
             <div key={event.id} className="relative">
               {/* Timeline dot */}
@@ -181,40 +156,38 @@ export const CommunityContent = () => {
               )}
 
               {/* Content */}
-              <div className="ml-8">
+              <div className="ml-6 sm:ml-8">
                 {/* Header */}
-                <div className="flex justify-between items-start">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
-                    <div>
-                      <h3 className="text-xl font-medium text-gray-900">
-                        {event.title}
-                      </h3>
-                      <div className="flex items-center space-x-2 text-gray-600 mt-0.5">
-                        <span className="font-medium">
-                          {getEventTypeLabel(event.type)}
-                        </span>
-                      </div>
-                      <div className="flex items-center space-x-2 text-sm text-gray-500 mt-0.5">
-                        {event.location && (
-                          <>
-                            <span>{event.location}</span>
-                            <span>•</span>
-                          </>
-                        )}
-                        <span>{event.date}</span>
-                        {event.attendees && (
-                          <>
-                            <span>•</span>
-                            <span>
-                              {event.attendees.toLocaleString()} participants
-                            </span>
-                          </>
-                        )}
-                      </div>
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                  <div className="flex-1">
+                    <h3 className="text-lg sm:text-xl font-medium text-gray-900">
+                      {event.title}
+                    </h3>
+                    <div className="flex items-center space-x-2 text-gray-600 mt-0.5">
+                      <span className="font-medium text-xs sm:text-sm">
+                        {getEventTypeLabel(event.type)}
+                      </span>
+                    </div>
+                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500 mt-0.5">
+                      {event.location && (
+                        <>
+                          <span>{event.location}</span>
+                          <span className="hidden sm:inline">•</span>
+                        </>
+                      )}
+                      <span>{event.date}</span>
+                      {event.attendees && (
+                        <>
+                          <span className="hidden sm:inline">•</span>
+                          <span>
+                            {event.attendees.toLocaleString()} participants
+                          </span>
+                        </>
+                      )}
                     </div>
                   </div>
                   {index === 0 && (
-                    <div className="mt-2 md:mt-0">
+                    <div className="mt-2 sm:mt-0">
                       <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-black/80 text-white">
                         Recent
                       </span>
@@ -223,7 +196,7 @@ export const CommunityContent = () => {
                 </div>
 
                 {/* Description */}
-                <p className="text-gray-700 font-light leading-relaxed mb-4 text-sm">
+                <p className="text-sm text-gray-700 font-light leading-relaxed mb-4 mt-3">
                   {event.description}
                 </p>
 
@@ -285,50 +258,30 @@ export const CommunityContent = () => {
         </div>
 
         {/* Call to Action */}
-        <div className="border-t border-gray-200 pt-8 mt-12">
-          <div className="bg-gray-50/50 rounded-2xl p-6">
+        <div className="border-t border-gray-200 pt-6 sm:pt-8 mt-8 sm:mt-12">
+          <div className="bg-gray-50/50 rounded-2xl p-4 sm:p-6">
             <h3 className="font-medium text-gray-900 mb-4">Join DefyDefault</h3>
             <div className="grid grid-cols-1 gap-3">
-              <a
+              <ExternalLink
                 href="https://discord.gg/8ADH6QzmAG"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 p-3 bg-white rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <Users size={16} className="text-gray-600" />
-                <span className="text-sm text-gray-700">Discord</span>
-                <ExternalLink size={12} className="text-gray-400 ml-auto" />
-              </a>
-              <a
+                icon={<Users size={16} className="text-gray-600" />}
+                label="Discord"
+              />
+              <ExternalLink
                 href="https://www.linkedin.com/company/defy-default/about/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 p-3 bg-white rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <Linkedin size={16} className="text-gray-600" />
-                <span className="text-sm text-gray-700">LinkedIn</span>
-                <ExternalLink size={12} className="text-gray-400 ml-auto" />
-              </a>
-              <a
+                icon={<Linkedin size={16} className="text-gray-600" />}
+                label="LinkedIn"
+              />
+              <ExternalLink
                 href="https://www.instagram.com/defy.dflt"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 p-3 bg-white rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <Instagram size={16} className="text-gray-600" />
-                <span className="text-sm text-gray-700">Instagram</span>
-                <ExternalLink size={12} className="text-gray-400 ml-auto" />
-              </a>
-              <a
+                icon={<Instagram size={16} className="text-gray-600" />}
+                label="Instagram"
+              />
+              <ExternalLink
                 href="https://x.com/defydflt"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center space-x-2 p-3 bg-white rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <Twitter size={16} className="text-gray-600" />
-                <span className="text-sm text-gray-700">Twitter</span>
-                <ExternalLink size={12} className="text-gray-400 ml-auto" />
-              </a>
+                icon={<Twitter size={16} className="text-gray-600" />}
+                label="Twitter"
+              />
             </div>
           </div>
         </div>

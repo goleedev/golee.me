@@ -1,3 +1,7 @@
+import { PageHeader } from '../shared/PageHeader';
+import { TimelineItem } from '../shared/TimelineItem';
+import { StatCard } from '../shared/StatCard';
+
 export const WorkContent = () => {
   const experiences = [
     {
@@ -16,6 +20,7 @@ export const WorkContent = () => {
         "Integrated MCP Agent Gateway into Zero Trust dashboard, unifying security and access management as part of Cloudflare's AI Week launch.",
       ],
       technologies: ['React', 'TypeScript', 'Jest', 'Cypress', 'Tailwind CSS'],
+      isCurrent: true,
     },
     {
       id: 'uncutgems',
@@ -87,127 +92,46 @@ export const WorkContent = () => {
     },
   ];
 
+  const stats = [
+    { metric: '4+', label: 'Years Experience' },
+    { metric: '4', label: 'Companies' },
+    { metric: '15+', label: 'Projects Delivered' },
+    { metric: '50+', label: 'Components Built' },
+  ];
+
   return (
-    <div className="px-8 py-8 h-full overflow-auto bg-white/95 backdrop-blur-xl">
+    <div className="px-4 sm:px-8 py-4 sm:py-8 h-full overflow-auto bg-white/95 backdrop-blur-xl">
       <div className="max-w-4xl mx-auto">
-        <div className="mb-8">
-          <h2 className="text-2xl font-light mb-2 text-gray-900">
-            Work Experience
-          </h2>
-          <p className="text-gray-600 font-light">
-            Building impactful web applications and user experiences
-          </p>
-        </div>
+        <PageHeader
+          title="Work Experience"
+          subtitle="Building impactful web applications and user experiences"
+        />
 
-        <div className="space-y-12">
+        <div className="space-y-8 sm:space-y-12">
           {experiences.map((exp, index) => (
-            <div key={exp.id} className="relative">
-              {/* Timeline dot */}
-              <div className="absolute left-0 top-0 w-2 h-2 bg-gray-400 rounded-full mt-1.5"></div>
-
-              {/* Timeline line */}
-              {index < experiences.length - 1 && (
-                <div className="absolute left-0.5 top-4 w-0.5 h-full bg-gray-200"></div>
-              )}
-
-              {/* Content */}
-              <div className="ml-8">
-                {/* Header */}
-                <div className="flex justify-between items-start">
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-3">
-                    <div>
-                      <h3 className="text-xl font-medium text-gray-900">
-                        {exp.role}
-                      </h3>
-                      <div className="flex items-center space-x-2 text-gray-600 mt-0.5">
-                        <span className="font-medium">{exp.company}</span>
-                      </div>
-                      <div className="flex items-center space-x-2 text-sm text-gray-500 mt-0.5">
-                        <span>{exp.location}</span>
-                        <span>•</span>
-                        <span>{exp.period}</span>
-                        <span>•</span>
-                        <span>{exp.type}</span>
-                      </div>
-                    </div>
-                  </div>
-                  {index === 0 && (
-                    <div className="mt-2 md:mt-0">
-                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-black/80 text-white">
-                        Current
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Description */}
-                <p className="text-gray-700 font-light leading-relaxed mb-4 text-sm">
-                  {exp.description}
-                </p>
-
-                {/* Achievements */}
-                <div className="mb-4">
-                  <ul className="space-y-2">
-                    {exp.achievements.map((achievement, achIndex) => (
-                      <li
-                        key={achIndex}
-                        className="text-sm text-gray-700 font-light leading-relaxed flex items-start"
-                      >
-                        <span className="text-gray-400 mr-3 mt-1.5 flex-shrink-0">
-                          •
-                        </span>
-                        <span>{achievement}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Technologies */}
-                <div className="flex flex-wrap gap-1.5">
-                  {exp.technologies.map((tech) => (
-                    <span
-                      key={tech}
-                      className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs font-light"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
+            <TimelineItem
+              key={exp.id}
+              title={exp.role}
+              subtitle={exp.company}
+              date={`${exp.location} • ${exp.period} • ${exp.type}`}
+              description={exp.description}
+              achievements={exp.achievements}
+              tags={exp.technologies}
+              isLast={index === experiences.length - 1}
+              isFeatured={exp.isCurrent}
+            />
           ))}
         </div>
 
         {/* Summary Stats */}
-        <div className="border-t border-gray-200 pt-8 mt-12">
-          <h3 className="text-lg font-medium text-gray-900 mb-6">
+        <div className="border-t border-gray-200 pt-6 sm:pt-8 mt-8 mb-6 sm:mt-12">
+          <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-4 sm:mb-6">
             Career Summary
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            <div>
-              <div className="text-2xl font-light text-gray-700 mb-1">4+</div>
-              <div className="text-xs text-gray-500 uppercase tracking-wide">
-                Years Experience
-              </div>
-            </div>
-            <div>
-              <div className="text-2xl font-light text-gray-700 mb-1">4</div>
-              <div className="text-xs text-gray-500 uppercase tracking-wide">
-                Companies
-              </div>
-            </div>
-            <div>
-              <div className="text-2xl font-light text-gray-700 mb-1">15+</div>
-              <div className="text-xs text-gray-500 uppercase tracking-wide">
-                Projects Delivered
-              </div>
-            </div>
-            <div>
-              <div className="text-2xl font-light text-gray-700 mb-1">50+</div>
-              <div className="text-xs text-gray-500 uppercase tracking-wide">
-                Components Built
-              </div>
-            </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+            {stats.map((stat, index) => (
+              <StatCard key={index} metric={stat.metric} label={stat.label} />
+            ))}
           </div>
         </div>
       </div>

@@ -4,6 +4,9 @@ export const DOCK_HEIGHT_DESKTOP = 64;
 export const DOCK_HEIGHT_MOBILE = 70;
 export const WINDOW_MARGIN = 0;
 
+export const MIN_WINDOW_WIDTH = 400;
+export const MIN_WINDOW_HEIGHT = 200;
+
 // Responsive breakpoints
 export const RESPONSIVE_BREAKPOINTS = {
   mobile: 768,

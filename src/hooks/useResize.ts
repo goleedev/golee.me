@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Position, Size, WindowState } from '../types';
+import { MIN_WINDOW_HEIGHT, MIN_WINDOW_WIDTH } from '../data/constants';
 
 interface ResizeState {
   isResizing: boolean;
@@ -68,16 +69,22 @@ export const useResize = (
 
         switch (resizeState.direction) {
           case 'se':
-            newSize.width = Math.max(300, resizeState.startSize.width + deltaX);
+            newSize.width = Math.max(
+              MIN_WINDOW_WIDTH,
+              resizeState.startSize.width + deltaX
+            );
             newSize.height = Math.max(
-              200,
+              MIN_WINDOW_HEIGHT,
               resizeState.startSize.height + deltaY
             );
             break;
           case 'sw':
-            newSize.width = Math.max(300, resizeState.startSize.width - deltaX);
+            newSize.width = Math.max(
+              MIN_WINDOW_WIDTH,
+              resizeState.startSize.width - deltaX
+            );
             newSize.height = Math.max(
-              200,
+              MIN_WINDOW_HEIGHT,
               resizeState.startSize.height + deltaY
             );
             newPosition.x =
@@ -85,9 +92,12 @@ export const useResize = (
               (resizeState.startSize.width - newSize.width);
             break;
           case 'ne':
-            newSize.width = Math.max(300, resizeState.startSize.width + deltaX);
+            newSize.width = Math.max(
+              MIN_WINDOW_WIDTH,
+              resizeState.startSize.width + deltaX
+            );
             newSize.height = Math.max(
-              200,
+              MIN_WINDOW_HEIGHT,
               resizeState.startSize.height - deltaY
             );
             newPosition.y =
@@ -95,9 +105,12 @@ export const useResize = (
               (resizeState.startSize.height - newSize.height);
             break;
           case 'nw':
-            newSize.width = Math.max(300, resizeState.startSize.width - deltaX);
+            newSize.width = Math.max(
+              MIN_WINDOW_WIDTH,
+              resizeState.startSize.width - deltaX
+            );
             newSize.height = Math.max(
-              200,
+              MIN_WINDOW_HEIGHT,
               resizeState.startSize.height - deltaY
             );
             newPosition.x =
@@ -109,7 +122,7 @@ export const useResize = (
             break;
           case 'n':
             newSize.height = Math.max(
-              200,
+              MIN_WINDOW_HEIGHT,
               resizeState.startSize.height - deltaY
             );
             newPosition.y =
@@ -118,15 +131,21 @@ export const useResize = (
             break;
           case 's':
             newSize.height = Math.max(
-              200,
+              MIN_WINDOW_HEIGHT,
               resizeState.startSize.height + deltaY
             );
             break;
           case 'e':
-            newSize.width = Math.max(300, resizeState.startSize.width + deltaX);
+            newSize.width = Math.max(
+              MIN_WINDOW_WIDTH,
+              resizeState.startSize.width + deltaX
+            );
             break;
           case 'w':
-            newSize.width = Math.max(300, resizeState.startSize.width - deltaX);
+            newSize.width = Math.max(
+              MIN_WINDOW_WIDTH,
+              resizeState.startSize.width - deltaX
+            );
             newPosition.x =
               resizeState.startWindowPos.x +
               (resizeState.startSize.width - newSize.width);
