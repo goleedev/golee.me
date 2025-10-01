@@ -1,8 +1,9 @@
 interface MenuBarProps {
   currentTime: Date;
+  onLogoClick: () => void;
 }
 
-const MenuBar = ({ currentTime }: MenuBarProps) => {
+const MenuBar = ({ currentTime, onLogoClick }: MenuBarProps) => {
   const months = [
     'Jan',
     'Feb',
@@ -32,11 +33,14 @@ const MenuBar = ({ currentTime }: MenuBarProps) => {
     .toLowerCase();
 
   return (
-    <div className="text-black font-medium flex justify-between items-center text-sm fixed top-0 w-full z-[9999] bg-white/75 backdrop-blur-xs px-4 py-1.5 shadow-sm">
-      <div className="flex items-center space-x-2">
+    <div className="text-black h-10 font-medium flex justify-between items-center text-sm fixed top-0 w-full z-[9999] bg-white/75 backdrop-blur-xs px-4 py-1.5 shadow-sm">
+      <button
+        onClick={onLogoClick}
+        className="flex items-center space-x-2 cursor-pointer"
+      >
         <span className="text-lg">🏁</span>
         <span className="font-medium">golee.dev</span>
-      </div>
+      </button>
       <div className="flex items-center space-x-1 text-xs font-light">
         <span>{weekday}</span>
         <span>{day}</span>

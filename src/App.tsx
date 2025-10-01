@@ -4,6 +4,7 @@ import {
   BrowserRouter as Router,
   Routes,
   useLocation,
+  useNavigate,
 } from 'react-router-dom';
 import Desktop from './components/desktop/Desktop';
 import Dock from './components/dock/Dock';
@@ -27,6 +28,7 @@ import { getWindowContent } from './utils/windowContentProvider';
 
 const BagelOSPortfolio = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [dockItems, setDockItems] = useState<DockItem[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [imageLoaded, setImageLoaded] = useState(false);
@@ -189,6 +191,11 @@ const BagelOSPortfolio = () => {
     ]
   );
 
+  const handleLogoClick = useCallback(() => {
+    setWindows([]);
+    navigate('/');
+  }, [setWindows, navigate]);
+
   return (
     <div className="h-screen w-full relative overflow-hidden bg-gray-100">
       {!imageLoaded && (
@@ -200,7 +207,7 @@ const BagelOSPortfolio = () => {
         </div>
       )}
 
-      <MenuBar currentTime={currentTime} />
+      <MenuBar currentTime={currentTime} onLogoClick={handleLogoClick} />
 
       {/* Sticky Notes */}
       {stickies.map((sticky) => (
