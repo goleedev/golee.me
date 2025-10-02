@@ -22,7 +22,7 @@ export const shouldAutoMaximize = () => {
 // Window size configurations
 export const getWindowSizes = (dockHeight: number) => ({
   default: { width: 600, height: 500 },
-  music: { width: 300, height: 500 },
+  music: { width: 400, height: 600 },
   mobile: {
     width: window.innerWidth,
     height: window.innerHeight - MENU_BAR_HEIGHT - dockHeight,
