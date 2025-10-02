@@ -35,6 +35,16 @@ interface Activity {
 export const ActivitiesContent = () => {
   const activities: Activity[] = [
     {
+      id: 'lead-developer-book-2025',
+      title: 'Lead Developer Career Guide Book Recommendation',
+      description:
+        'Provided a recommendation for the Korean translation of "Lead Developer Career Guide" published by Jpub, sharing insights on technical leadership and career development paths in the tech industry.',
+      date: 'October 2025',
+      category: 'book-recommendation',
+      organization: 'Jpub',
+      image: '/activities/lead-developer-book.png',
+    },
+    {
       id: 'k-devcon-recorder-2025',
       title: 'RE:CORDER Interview Project',
       description:
