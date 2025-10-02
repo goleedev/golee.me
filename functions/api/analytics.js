@@ -29,12 +29,23 @@ export async function onRequest(context) {
     // POST - Track visit
     if (request.method === 'POST') {
       try {
-        const body = await request.json();
-        const { country, referrer } = body;
+        // Cloudflare가 제공하는 실제 IP 기반 국가 정보 사용
+        const country = request.headers.get('CF-IPCountry') || 'Unknown';
+
+        // body에서 referrer 가져오기 (없으면 헤더에서)
+        let referrer = 'Direct';
+        try {
+          const body = await request.json();
+          referrer = body.referrer || 'Direct';
+        } catch (e) {
+          // body 파싱 실패시 헤더에서 가져오기
+          referrer = request.headers.get('Referer') || 'Direct';
+        }
+
         const userAgent = request.headers.get('User-Agent') || 'unknown';
         const timestamp = new Date().toISOString();
 
-        // Create analytics table if not exists (IP 제거)
+        // Create analytics table if not exists
         await env.DB.prepare(
           `
           CREATE TABLE IF NOT EXISTS analytics_visits (
@@ -48,25 +59,21 @@ export async function onRequest(context) {
         `
         ).run();
 
-        // Insert visit (IP 없이)
+        // Insert visit
         await env.DB.prepare(
           `
           INSERT INTO analytics_visits (country, referrer, user_agent, visited_at)
           VALUES (?, ?, ?, ?)
         `
         )
-          .bind(
-            country || 'Unknown',
-            referrer || 'Direct',
-            userAgent,
-            timestamp
-          )
+          .bind(country, referrer, userAgent, timestamp)
           .run();
 
         return new Response(
           JSON.stringify({
             success: true,
             message: 'Visit tracked',
+            country: country, // 디버깅용
           }),
           {
             headers: { 'Content-Type': 'application/json', ...corsHeaders },
@@ -78,6 +85,7 @@ export async function onRequest(context) {
           JSON.stringify({
             success: false,
             error: error.message,
+            stack: error.stack,
           }),
           {
             status: 500,
@@ -210,6 +218,7 @@ export async function onRequest(context) {
       JSON.stringify({
         success: false,
         error: error.message,
+        stack: error.stack,
       }),
       {
         status: 500,
