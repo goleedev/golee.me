@@ -1,0 +1,141 @@
+---
+title: 5 Must-Know CSS Features of 2024
+date: 2024-04-14
+description: Dive into the latest CSS advancements that streamline web design!
+thumbnailUrl: /thumbnails/css-2024.png
+---
+
+![CSS 2024](/posts/css-2024/css.png)
+
+The world of CSS is constantly evolving, giving web developers like you even more powerful tools to create beautiful and responsive user interfaces.
+
+This year is no different! Several key features have become more widely supported by browsers, making them prime candidates for your CSS toolbox.
+
+Let's dive into five of these features and explore how they can elevate your web design projects.
+
+---
+
+## Subgrid
+
+Imagine creating complex grid layouts within a single grid container. That's the power of subgrid!
+
+It allows you to **define a sub-grid system within a grid item**, providing a hierarchical approach to layout structuring. This is particularly useful for building intricate user interfaces with nested components.
+
+Subgrid utilizes the `subgrid` property on a grid item to define a new grid within it. You can specify grid properties like `grid-template-columns` and `grid-template-rows` for the subgrid, creating a nested grid structure. This enables precise control over the layout of elements within a grid item, promoting a more organized and flexible approach to web design.
+
+import { CodePen } from 'mdx-embed';
+
+<br />
+<CodePen codePenId="ZEZjaEP" />
+<br />
+
+- [Check Subgrid Browser Compatibility](https://caniuse.com/?search=subgrid)
+  ![Subgrid Browser Compatibility](/posts/css-2024/subgrid.png)
+
+---
+
+## :has() Pseudo-Class
+
+The `:has()` pseudo-class is a game-changer for **targeting elements based on their relationship with descendant elements**.
+
+This eliminates the need for complex selector chains and improves code maintainability.
+
+`:has()` targets an element based on a selector that **matches one or more of its descendant elements**. This allows you to style parent elements based on the presence or state of their child elements.
+
+<br />
+<CodePen codePenId="RwOBjrV" />
+<br />
+
+- [Check :has() Browser Compatibility](<https://caniuse.com/?search=%3Ahas()>)
+  ![:has() Browser Compatibility](/posts/css-2024/has.png)
+
+---
+
+## Nesting
+
+CSS nesting is a feature that allows you to **define styles for child elements within a parent element using indentation**.
+
+This can significantly **improve the readability and maintainability** of your CSS code, especially when working with complex styles.
+
+Here's a basic example of how nesting works:
+
+```css:styles.css
+/* Without nesting selector */
+parent {
+  /* parent styles */
+  child {
+    /* child of parent styles */
+  }
+}
+
+/* With nesting selector */
+parent {
+  /* parent styles */
+  & child {
+    /* child of parent styles */
+  }
+}
+
+/* the browser will parse both of these as */
+parent {
+  /* parent styles */
+}
+parent child {
+  /* child of parent styles */
+}
+
+```
+
+<br />
+<CodePen codePenId="yLrqPMr" />
+<br />
+
+- [Check CSS Nesting Browser Compatibility](https://caniuse.com/?search=nesting)
+  ![Nesting Browser Compatibility](/posts/css-2024/nesting.png)
+
+---
+
+## Container Queries
+
+Container queries are a powerful new feature in CSS that allows you to apply styles to the children of an element **based on the size of that element, not just the entire viewport**.
+
+This offers a more granular approach to responsive design compared to traditional media queries.
+
+<br />
+<CodePen codePenId="NWmBwvO" />
+<br />
+
+- [Check Container Query Browser Compatibility](https://caniuse.com/?search=container%20query)
+  ![Container Query Browser Compatibility](/posts/css-2024/container-query.png)
+
+---
+
+## text-wrap: balance
+
+`text-wrap: balance` is a CSS property that controls how text inside an element wraps onto multiple lines.
+
+It prioritizes creating **lines with roughly the same width**, aiming for a more aesthetically pleasing and balanced layout, especially for headings and titles.
+
+This can enhance readability and visual appeal on your web pages.
+
+<br />
+<CodePen codePenId="OJGwOQE" />
+<br />
+
+- [Check text-wrap: balance Browser Compatibility](https://caniuse.com/?search=text-wrap%3A%20balance)
+  ![text-wrap: balance Browser Compatibility](/posts/css-2024/balance.png)
+
+---
+
+## Wrapping Up
+
+I hope that you found this post helpful.
+
+If some info is outdated or incorrect, or you have anything to add, say or ask, please contact me via [email](mailto:golee.dev@gmail.com).
+
+---
+
+## References
+
+- [MDN Web Docs - CSS](https://developer.mozilla.org/en-US/docs/Web/CSS)
+- [5 CSS snippets every front-end developer should know in 2024](https://web.dev/articles/5-css-snippets-every-front-end-developer-should-know-in-2024#let_the_browser_balance_headlines)

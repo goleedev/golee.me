@@ -1,6 +1,7 @@
 import React from 'react';
 import { AboutContent } from '../components/windows/AboutContent';
 import { WorkContent } from '../components/windows/WorkContent';
+import { BlogContent } from '../components/windows/BlogContent';
 import { ActivitiesContent } from '../components/windows/ActivitiesContent';
 import { CommunityContent } from '../components/windows/CommunityContent';
 import { MentorshipContent } from '../components/windows/MentorshipContent';
@@ -22,6 +23,7 @@ export const getWindowContent = (
   const contents: Record<string, React.ReactNode> = {
     about: <AboutContent />,
     work: <WorkContent />,
+    blog: <BlogContent />,
     activities: <ActivitiesContent />,
     community: <CommunityContent />,
     mentorship: <MentorshipContent />,

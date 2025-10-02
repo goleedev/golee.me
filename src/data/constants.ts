@@ -40,14 +40,27 @@ export const getBagelIconPositions = (centerX: number, centerY: number) => {
   const radiusX = Math.max(baseRadius, 60);
   const radiusY = Math.max(baseRadius * 1.05, 65);
 
+  // Calculate about me position first
+  const aboutX = centerX + radiusX * Math.cos((220 * Math.PI) / 180);
+  const aboutY = centerY + radiusY * Math.sin((230 * Math.PI) / 180);
+
+  // Calculate blog position: 45 degrees up and to the right from about me
+  const distance = 70; // Distance from about me icon
+  const blogX = aboutX + distance * Math.cos((45 * Math.PI) / 180);
+  const blogY = aboutY - distance * Math.sin((45 * Math.PI) / 180);
+
   return {
     about: {
-      x: centerX + radiusX * Math.cos((220 * Math.PI) / 180),
-      y: centerY + radiusY * Math.sin((230 * Math.PI) / 180),
+      x: aboutX,
+      y: aboutY,
     },
     work: {
       x: centerX + radiusX * Math.cos((350 * Math.PI) / 180),
       y: centerY + radiusY * Math.sin((300 * Math.PI) / 180),
+    },
+    blog: {
+      x: blogX,
+      y: blogY,
     },
     community: {
       x: centerX + radiusX * Math.cos((315 * Math.PI) / 180),

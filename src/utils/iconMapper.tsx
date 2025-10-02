@@ -7,6 +7,7 @@ export const getIconForItem = (id: string): React.ReactNode => {
   const iconMap: Record<string, React.ReactNode> = {
     about: <NoteIcon />,
     work: <NoteIcon />,
+    blog: <FolderIcon />,
     community: <FolderIcon />,
     mentorship: <NoteIcon />,
     activities: <FolderIcon />,

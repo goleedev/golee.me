@@ -8,6 +8,7 @@ const createIconComponent = (itemId: string) => {
   const folderIcons = {
     about: <NoteIcon />,
     work: <FolderIcon />,
+    blog: <FolderIcon />,
     community: <NoteIcon />,
     mentorship: <NoteIcon />,
     activities: <FolderIcon />,
