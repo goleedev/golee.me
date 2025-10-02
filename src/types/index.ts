@@ -69,3 +69,12 @@ export interface StickyDragState {
   startPos: Position;
   startStickyPos: Position;
 }
+
+export interface BlogPost {
+  slug: string;
+  title: string;
+  date: string;
+  description: string;
+  thumbnailUrl: string;
+  readTime?: string;
+}
