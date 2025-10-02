@@ -17,28 +17,32 @@ export const useUrlNavigation = (
   const processedUrlRef = useRef<string>('');
 
   useEffect(() => {
-    if (currentPageId && currentPageId !== '' && dockItems.length > 0) {
-      if (processedUrlRef.current !== currentPageId) {
-        processedUrlRef.current = currentPageId;
+    // Extract base page ID from URL (e.g., "blog" from "blog/some-post")
+    const basePageId = currentPageId.split('/')[0];
 
-        const existingWindow = windows.find((w) => w.id === currentPageId);
+    if (basePageId && basePageId !== '' && dockItems.length > 0) {
+      // Check if we've already processed this base page
+      if (processedUrlRef.current !== basePageId) {
+        processedUrlRef.current = basePageId;
+
+        const existingWindow = windows.find((w) => w.id === basePageId);
 
         if (!existingWindow) {
-          const dockItem = dockItems.find((item) => item.id === currentPageId);
+          const dockItem = dockItems.find((item) => item.id === basePageId);
           if (dockItem) {
-            openWindow(currentPageId, dockItem, getWindowContent);
+            openWindow(basePageId, dockItem, getWindowContent);
             setTimeout(() => {
-              const newWindow = windows.find((w) => w.id === currentPageId);
+              const newWindow = windows.find((w) => w.id === basePageId);
               if (newWindow && !newWindow.isMaximized) {
-                maximizeWindow(currentPageId);
+                maximizeWindow(basePageId);
               }
             }, 200);
           }
         } else {
-          bringToFront(currentPageId);
+          bringToFront(basePageId);
           if (!existingWindow.isMaximized) {
             setTimeout(() => {
-              maximizeWindow(currentPageId);
+              maximizeWindow(basePageId);
             }, 100);
           }
         }
