@@ -67,89 +67,188 @@ export const useResize = (
         const newSize = { ...resizeState.startSize };
         const newPosition = { ...resizeState.startWindowPos };
 
+        const maxWidth = globalThis.window.innerWidth;
+        const maxHeight = globalThis.window.innerHeight;
+
         switch (resizeState.direction) {
-          case 'se':
+          case 'se': {
             newSize.width = Math.max(
               MIN_WINDOW_WIDTH,
-              resizeState.startSize.width + deltaX
+              Math.min(
+                resizeState.startSize.width + deltaX,
+                maxWidth - resizeState.startWindowPos.x
+              )
             );
             newSize.height = Math.max(
               MIN_WINDOW_HEIGHT,
-              resizeState.startSize.height + deltaY
+              Math.min(
+                resizeState.startSize.height + deltaY,
+                maxHeight - resizeState.startWindowPos.y
+              )
             );
             break;
-          case 'sw':
-            newSize.width = Math.max(
-              MIN_WINDOW_WIDTH,
-              resizeState.startSize.width - deltaX
-            );
-            newSize.height = Math.max(
-              MIN_WINDOW_HEIGHT,
-              resizeState.startSize.height + deltaY
-            );
-            newPosition.x =
-              resizeState.startWindowPos.x +
-              (resizeState.startSize.width - newSize.width);
-            break;
-          case 'ne':
-            newSize.width = Math.max(
-              MIN_WINDOW_WIDTH,
-              resizeState.startSize.width + deltaX
-            );
-            newSize.height = Math.max(
-              MIN_WINDOW_HEIGHT,
-              resizeState.startSize.height - deltaY
-            );
-            newPosition.y =
-              resizeState.startWindowPos.y +
-              (resizeState.startSize.height - newSize.height);
-            break;
-          case 'nw':
-            newSize.width = Math.max(
+          }
+
+          case 'sw': {
+            const newWidthSW = Math.max(
               MIN_WINDOW_WIDTH,
               resizeState.startSize.width - deltaX
             );
-            newSize.height = Math.max(
-              MIN_WINDOW_HEIGHT,
-              resizeState.startSize.height - deltaY
-            );
-            newPosition.x =
+            const newXSW =
               resizeState.startWindowPos.x +
-              (resizeState.startSize.width - newSize.width);
-            newPosition.y =
-              resizeState.startWindowPos.y +
-              (resizeState.startSize.height - newSize.height);
-            break;
-          case 'n':
+              (resizeState.startSize.width - newWidthSW);
+
+            if (newXSW >= 0) {
+              newSize.width = newWidthSW;
+              newPosition.x = newXSW;
+            } else {
+              newSize.width =
+                resizeState.startWindowPos.x + resizeState.startSize.width;
+              newPosition.x = 0;
+            }
+
             newSize.height = Math.max(
               MIN_WINDOW_HEIGHT,
-              resizeState.startSize.height - deltaY
-            );
-            newPosition.y =
-              resizeState.startWindowPos.y +
-              (resizeState.startSize.height - newSize.height);
-            break;
-          case 's':
-            newSize.height = Math.max(
-              MIN_WINDOW_HEIGHT,
-              resizeState.startSize.height + deltaY
+              Math.min(
+                resizeState.startSize.height + deltaY,
+                maxHeight - resizeState.startWindowPos.y
+              )
             );
             break;
-          case 'e':
+          }
+
+          case 'ne': {
             newSize.width = Math.max(
               MIN_WINDOW_WIDTH,
-              resizeState.startSize.width + deltaX
+              Math.min(
+                resizeState.startSize.width + deltaX,
+                maxWidth - resizeState.startWindowPos.x
+              )
             );
+
+            const newHeightNE = Math.max(
+              MIN_WINDOW_HEIGHT,
+              resizeState.startSize.height - deltaY
+            );
+            const newYNE =
+              resizeState.startWindowPos.y +
+              (resizeState.startSize.height - newHeightNE);
+
+            if (newYNE >= 40) {
+              newSize.height = newHeightNE;
+              newPosition.y = newYNE;
+            } else {
+              newSize.height =
+                resizeState.startWindowPos.y +
+                resizeState.startSize.height -
+                40;
+              newPosition.y = 40;
+            }
             break;
-          case 'w':
-            newSize.width = Math.max(
+          }
+
+          case 'nw': {
+            const newWidthNW = Math.max(
               MIN_WINDOW_WIDTH,
               resizeState.startSize.width - deltaX
             );
-            newPosition.x =
+            const newXNW =
               resizeState.startWindowPos.x +
-              (resizeState.startSize.width - newSize.width);
+              (resizeState.startSize.width - newWidthNW);
+
+            if (newXNW >= 0) {
+              newSize.width = newWidthNW;
+              newPosition.x = newXNW;
+            } else {
+              newSize.width =
+                resizeState.startWindowPos.x + resizeState.startSize.width;
+              newPosition.x = 0;
+            }
+
+            const newHeightNW = Math.max(
+              MIN_WINDOW_HEIGHT,
+              resizeState.startSize.height - deltaY
+            );
+            const newYNW =
+              resizeState.startWindowPos.y +
+              (resizeState.startSize.height - newHeightNW);
+
+            if (newYNW >= 40) {
+              newSize.height = newHeightNW;
+              newPosition.y = newYNW;
+            } else {
+              newSize.height =
+                resizeState.startWindowPos.y +
+                resizeState.startSize.height -
+                40;
+              newPosition.y = 40;
+            }
             break;
+          }
+
+          case 'n': {
+            const newHeightN = Math.max(
+              MIN_WINDOW_HEIGHT,
+              resizeState.startSize.height - deltaY
+            );
+            const newYN =
+              resizeState.startWindowPos.y +
+              (resizeState.startSize.height - newHeightN);
+
+            if (newYN >= 40) {
+              newSize.height = newHeightN;
+              newPosition.y = newYN;
+            } else {
+              newSize.height =
+                resizeState.startWindowPos.y +
+                resizeState.startSize.height -
+                40;
+              newPosition.y = 40;
+            }
+            break;
+          }
+
+          case 's': {
+            newSize.height = Math.max(
+              MIN_WINDOW_HEIGHT,
+              Math.min(
+                resizeState.startSize.height + deltaY,
+                maxHeight - resizeState.startWindowPos.y
+              )
+            );
+            break;
+          }
+
+          case 'e': {
+            newSize.width = Math.max(
+              MIN_WINDOW_WIDTH,
+              Math.min(
+                resizeState.startSize.width + deltaX,
+                maxWidth - resizeState.startWindowPos.x
+              )
+            );
+            break;
+          }
+
+          case 'w': {
+            const newWidthW = Math.max(
+              MIN_WINDOW_WIDTH,
+              resizeState.startSize.width - deltaX
+            );
+            const newXW =
+              resizeState.startWindowPos.x +
+              (resizeState.startSize.width - newWidthW);
+
+            if (newXW >= 0) {
+              newSize.width = newWidthW;
+              newPosition.x = newXW;
+            } else {
+              newSize.width =
+                resizeState.startWindowPos.x + resizeState.startSize.width;
+              newPosition.x = 0;
+            }
+            break;
+          }
         }
 
         const constrainedSize = constrainSize(newSize, newPosition);
