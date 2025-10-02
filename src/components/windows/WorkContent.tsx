@@ -128,7 +128,7 @@ export const WorkContent = () => {
           <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-4 sm:mb-6">
             Career Summary
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-2 gap-4 sm:gap-6">
             {stats.map((stat, index) => (
               <StatCard key={index} metric={stat.metric} label={stat.label} />
             ))}

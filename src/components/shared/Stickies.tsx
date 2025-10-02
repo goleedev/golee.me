@@ -15,6 +15,9 @@ interface StickiesProps {
   isMobile: boolean;
 }
 
+const CACHE_DURATION = 15 * 60 * 1000;
+const CACHE_KEY = 'analytics_cache';
+
 const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
   const [metrics, setMetrics] = useState<MetricsData>({
     todaysViews: 0,
@@ -27,6 +30,23 @@ const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
 
   const fetchMetrics = async () => {
     try {
+      // Check cache first
+      const cached = localStorage.getItem(CACHE_KEY);
+      if (cached) {
+        try {
+          const { data, timestamp } = JSON.parse(cached);
+          if (Date.now() - timestamp < CACHE_DURATION) {
+            setMetrics(data);
+            setIsLoading(false);
+            console.log('Analytics: Using cached data');
+            return;
+          }
+        } catch {
+          // Invalid cache, continue to fetch
+          console.log('Analytics: Cache invalid, fetching fresh data');
+        }
+      }
+
       setIsLoading(true);
 
       const response = await fetch('/api/analytics', {
@@ -44,6 +64,16 @@ const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
 
       if (result.success) {
         setMetrics(result.data);
+
+        // Cache the result
+        localStorage.setItem(
+          CACHE_KEY,
+          JSON.stringify({
+            data: result.data,
+            timestamp: Date.now(),
+          })
+        );
+        console.log('Analytics: Data fetched and cached');
       } else {
         console.error('Failed to fetch analytics:', result.error);
         setMetrics({
@@ -71,7 +101,7 @@ const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
   useEffect(() => {
     fetchMetrics();
 
-    const interval = setInterval(fetchMetrics, 5 * 60 * 1000);
+    const interval = setInterval(fetchMetrics, CACHE_DURATION);
     return () => clearInterval(interval);
   }, []);
 
