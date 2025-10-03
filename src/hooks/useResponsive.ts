@@ -7,12 +7,14 @@ import {
 
 export const useResponsive = () => {
   const [isMobile, setIsMobile] = useState(
-    window.innerWidth < RESPONSIVE_BREAKPOINTS.mobile
+    window.innerWidth <= RESPONSIVE_BREAKPOINTS.mobile
   );
 
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < RESPONSIVE_BREAKPOINTS.mobile);
+      // Add a small buffer to prevent flickering at exact breakpoint
+      const buffer = 5;
+      setIsMobile(window.innerWidth <= RESPONSIVE_BREAKPOINTS.mobile + buffer);
     };
 
     checkMobile();

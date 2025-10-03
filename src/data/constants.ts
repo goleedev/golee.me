@@ -24,7 +24,7 @@ export const getWindowSizes = (dockHeight: number) => ({
   default: { width: 600, height: 500 },
   music: { width: 400, height: 600 },
   mobile: {
-    width: window.innerWidth,
+    width: window.innerWidth, // Use full width for mobile
     height: window.innerHeight - MENU_BAR_HEIGHT - dockHeight,
   },
 });

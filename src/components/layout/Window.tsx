@@ -27,7 +27,7 @@ const Window = ({
   <div
     className={`absolute bg-white/95 backdrop-blur-xl overflow-hidden transition-all duration-300 ${
       isMobile
-        ? 'rounded-none border-none'
+        ? 'rounded-none border-none max-w-full'
         : 'rounded-2xl shadow-2xl border border-white/20'
     } ${
       window.isMinimized
@@ -140,7 +140,7 @@ const Window = ({
 
     {/* Content area */}
     <div
-      className="overflow-hidden relative"
+      className="overflow-auto relative"
       style={{
         height: isMobile ? `calc(100% - 48px)` : `calc(100% - 33px)`,
       }}

@@ -79,7 +79,7 @@ export const MentorshipContent: React.FC = () => {
 
   return (
     <div className="px-6 pt-6 h-full overflow-auto bg-white/95 backdrop-blur-xl">
-      <div className="max-w-2xl mx-auto">
+      <div className="w-full mx-auto min-w-0">
         <div className="text-center mb-8">
           <h2 className="text-2xl font-light mb-2 text-gray-900">Mentorship</h2>
           <p className="text-gray-600 font-light">

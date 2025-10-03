@@ -101,7 +101,7 @@ export const WorkContent = () => {
 
   return (
     <div className="px-4 sm:px-8 py-4 sm:py-8 h-full overflow-auto bg-white/95 backdrop-blur-xl">
-      <div className="max-w-4xl mx-auto">
+      <div className="w-full mx-auto min-w-0">
         <PageHeader
           title="Work Experience"
           subtitle="Building impactful web applications and user experiences"

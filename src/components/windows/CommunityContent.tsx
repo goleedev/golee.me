@@ -125,7 +125,7 @@ export const CommunityContent = () => {
 
   return (
     <div className="px-4 sm:px-8 py-4 sm:py-8 h-full overflow-auto bg-white/95 backdrop-blur-xl">
-      <div className="max-w-4xl mx-auto">
+      <div className="w-full mx-auto min-w-0">
         <PageHeader
           title="Community Journey"
           subtitle="Building and empowering the women in tech community since 2019"

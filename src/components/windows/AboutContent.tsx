@@ -114,7 +114,7 @@ export const AboutContent = () => {
 
   return (
     <div className="px-4 sm:px-6 pt-4 sm:pt-6 h-full overflow-auto bg-white/95 backdrop-blur-xl">
-      <div className="max-w-2xl mx-auto">
+      <div className="w-full mx-auto min-w-0">
         {/* Header Section */}
         <div className="text-center mb-6 sm:mb-8">
           <img
@@ -157,13 +157,13 @@ export const AboutContent = () => {
 
         {/* About */}
         <ContentSection className="mb-6">
-          <p className="text-sm sm:text-base text-gray-700 leading-relaxed font-light mb-4">
+          <p className="text-sm sm:text-base text-gray-700 leading-relaxed font-light mb-4 break-words">
             Driven frontend engineer with 4+ years of experience building
             impactful web applications. Currently working at Cloudflare,
             focusing on user experience improvements and secure dashboard
             solutions.
           </p>
-          <p className="text-sm sm:text-base text-gray-700 leading-relaxed font-light">
+          <p className="text-sm sm:text-base text-gray-700 leading-relaxed font-light break-words">
             Co-founder of DefyDefault, a pioneering Women in Tech community that
             has grown to 11,500+ members globally, with partnerships across
             major tech companies.

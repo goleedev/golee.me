@@ -127,6 +127,24 @@ body {
     animation: slideInFromBottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
+  /* Smooth transitions for responsive changes */
+  .window {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Ensure mobile windows are fully responsive */
+  @media (max-width: 768px) {
+    .window {
+      width: 100vw !important;
+      max-width: none !important;
+    }
+
+    .window > div:last-child {
+      width: 100% !important;
+      max-width: none !important;
+    }
+  }
+
   @keyframes slideInFromBottom {
     from {
       transform: translateY(100%);

@@ -275,7 +275,7 @@ export const GuestbookContent = () => {
 
   return (
     <div className="px-6 pt-6 h-full overflow-auto bg-white/95 backdrop-blur-xl">
-      <div className="max-w-2xl mx-auto">
+      <div className="w-full mx-auto min-w-0">
         {/* Header - consistent with other windows */}
         <div className="text-center mb-8">
           <h2 className="text-2xl font-light mb-2 text-gray-900">Guest Book</h2>

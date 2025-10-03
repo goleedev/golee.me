@@ -22,7 +22,7 @@ export const BlogPost: React.FC<BlogPostProps> = ({
 }) => {
   return (
     <div className="px-4 sm:px-6 pt-4 sm:pt-6 h-full overflow-y-scroll bg-white/95 backdrop-blur-xl">
-      <div className="max-w-3xl mx-auto">
+      <div className="w-full mx-auto min-w-0">
         <button
           onClick={onBack}
           className="flex items-center space-x-2 text-gray-600 hover:text-gray-900 mb-6 transition-colors"

@@ -188,7 +188,7 @@ export const ActivitiesContent = () => {
 
   return (
     <div className="px-4 sm:px-6 pt-4 sm:pt-6 h-full overflow-auto bg-white/95 backdrop-blur-xl">
-      <div className="max-w-2xl mx-auto">
+      <div className="w-full mx-auto min-w-0">
         <PageHeader
           title="Activities"
           subtitle="Speaking engagements, media appearances, and industry contributions"
@@ -239,7 +239,7 @@ export const ActivitiesContent = () => {
                         </div>
                       </div>
 
-                      <p className="text-sm text-gray-700 font-light mb-3 leading-relaxed">
+                      <p className="text-sm text-gray-700 font-light mb-3 leading-relaxed break-words">
                         {activity.description}
                       </p>
 
