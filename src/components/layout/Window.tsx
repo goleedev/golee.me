@@ -149,7 +149,7 @@ const Window = ({
       style={{
         height: isMobile ? `calc(100% - 48px)` : `calc(100% - 33px)`,
       }}
-      onMouseDown={(e) => {
+      onMouseDown={() => {
         if (!window.isMinimized && !isMobile) {
           onBringToFront(window.id);
         }

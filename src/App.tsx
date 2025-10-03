@@ -24,6 +24,7 @@ import { useWindowManagement } from './hooks/useWindowManagement';
 import type { DockItem } from './types';
 import { trackVisit } from './utils/analytics';
 import { getIconForItem } from './utils/iconMapper';
+import { useOGImageUpdater } from './utils/ogImageManager';
 import { getWindowContent } from './utils/windowContentProvider';
 
 const BagelOSPortfolio = () => {
@@ -34,6 +35,9 @@ const BagelOSPortfolio = () => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const currentPageId = location.pathname.substring(1);
+
+  // OG Image updater
+  useOGImageUpdater(location.pathname);
 
   // Responsive hook
   const { isMobile, dockHeight } = useResponsive();

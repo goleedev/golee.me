@@ -5,7 +5,6 @@ import { BlogPost } from './blog/BlogPost';
 export const BlogContent = () => {
   const {
     selectedPost,
-    isLoading,
     postContent,
     isLoadingPost,
     blogPosts,
@@ -27,7 +26,7 @@ export const BlogContent = () => {
   return (
     <BlogList
       posts={blogPosts}
-      isLoading={isLoading}
+      isLoading={isLoadingPost}
       onPostClick={handlePostClick}
     />
   );
