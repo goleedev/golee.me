@@ -9,6 +9,7 @@ export const useBlogContent = () => {
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
   const [postContent, setPostContent] = useState<string>('');
   const [isLoadingPost, setIsLoadingPost] = useState(false);
+  const [isLoadingList, setIsLoadingList] = useState(false);
 
   // Handle URL-based navigation
   useEffect(() => {
@@ -22,6 +23,21 @@ export const useBlogContent = () => {
     } else if (pathParts[1] === 'blog' && !pathParts[2]) {
       setSelectedPost(null);
       setPostContent('');
+    }
+  }, [location.pathname]);
+
+  // Set loading state for blog list
+  useEffect(() => {
+    if (
+      location.pathname === '/blog' ||
+      location.pathname.startsWith('/blog/')
+    ) {
+      setIsLoadingList(true);
+      // Simulate loading time
+      const timer = setTimeout(() => {
+        setIsLoadingList(false);
+      }, 500);
+      return () => clearTimeout(timer);
     }
   }, [location.pathname]);
 
@@ -61,6 +77,7 @@ export const useBlogContent = () => {
     selectedPost,
     postContent,
     isLoadingPost,
+    isLoadingList,
     blogPosts,
     handlePostClick,
     handleBackClick,

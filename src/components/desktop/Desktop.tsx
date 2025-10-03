@@ -46,16 +46,13 @@ const Desktop: React.FC<DesktopProps> = ({
         style={{
           backgroundImage: 'url(/bagel.png)',
           backgroundColor: '#fff',
-          filter: imageLoaded ? 'none' : 'blur(5px)',
-          transition: 'filter 0.5s ease-in-out',
-          opacity: imageLoaded ? 1 : 0,
-          transitionDelay: imageLoaded ? '0.5s' : '0s',
+          filter: imageLoaded ? 'blur(0px)' : 'blur(5px)',
+          transition: 'filter 1s ease-in-out',
           zIndex: 0,
         }}
       >
         {/* Desktop icons - only show on desktop */}
         {!isMobile &&
-          imageLoaded &&
           dockItems.map((item) => {
             const iconPos = desktopIconPositions[item.id] || { x: 0, y: 0 };
             const isSelected = selectedIcon === item.id;

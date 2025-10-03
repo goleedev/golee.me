@@ -7,6 +7,7 @@ export const BlogContent = () => {
     selectedPost,
     postContent,
     isLoadingPost,
+    isLoadingList,
     blogPosts,
     handlePostClick,
     handleBackClick,
@@ -26,7 +27,7 @@ export const BlogContent = () => {
   return (
     <BlogList
       posts={blogPosts}
-      isLoading={isLoadingPost}
+      isLoading={isLoadingList}
       onPostClick={handlePostClick}
     />
   );

@@ -138,12 +138,14 @@ const BagelOSPortfolio = () => {
     return () => clearInterval(timer);
   }, []);
 
-  // Image loading
+  // Image loading - 백그라운드에서 로드
   useEffect(() => {
     const img = new Image();
     img.onload = () => setImageLoaded(true);
+    img.onerror = () => setImageLoaded(true); // 에러나도 일단 표시
     img.src = '/bagel.png';
 
+    // 3초 타임아웃 후 강제로 표시
     const timeout = setTimeout(() => setImageLoaded(true), 3000);
     return () => clearTimeout(timeout);
   }, []);
@@ -204,15 +206,6 @@ const BagelOSPortfolio = () => {
 
   return (
     <div className="h-screen w-full relative overflow-hidden bg-gray-100">
-      {!imageLoaded && (
-        <div className="absolute inset-0 bg-gray-100 flex items-center justify-center z-50">
-          <div className="text-center">
-            <div className="w-12 h-12 border-4 border-gray-300 border-t-gray-800 rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600 font-light">Loading...</p>
-          </div>
-        </div>
-      )}
-
       <MenuBar currentTime={currentTime} onLogoClick={handleLogoClick} />
 
       {/* Sticky Notes */}

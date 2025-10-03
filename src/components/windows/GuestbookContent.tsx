@@ -285,30 +285,63 @@ export const GuestbookContent = () => {
         </div>
 
         {/* Summary Stats - consistent with WorkContent */}
+        {/* Summary Stats - consistent with WorkContent */}
         <div className="grid grid-cols-3 gap-4 mb-8">
+          {/* Total Messages */}
           <div className="bg-gray-50/80 rounded-2xl p-4 text-center">
-            <div className="text-xl font-light text-gray-700 mb-1">
-              {pagination?.total || 0}
-            </div>
-            <div className="text-xs text-gray-500 uppercase tracking-wide">
-              Total Messages
-            </div>
+            {isLoading ? (
+              <div className="animate-pulse">
+                <div className="h-6 w-12 mx-auto bg-gray-200 rounded mb-2"></div>
+                <div className="h-3 w-20 mx-auto bg-gray-200 rounded"></div>
+              </div>
+            ) : (
+              <>
+                <div className="text-xl font-light text-gray-700 mb-1">
+                  {pagination?.total || 0}
+                </div>
+                <div className="text-xs text-gray-500 uppercase tracking-wide">
+                  Total Messages
+                </div>
+              </>
+            )}
           </div>
+
+          {/* Featured */}
           <div className="bg-gray-50/80 rounded-2xl p-4 text-center">
-            <div className="text-xl font-light text-gray-700 mb-1">
-              {entries.filter((e) => e.is_featured).length}
-            </div>
-            <div className="text-xs text-gray-500 uppercase tracking-wide">
-              Featured
-            </div>
+            {isLoading ? (
+              <div className="animate-pulse">
+                <div className="h-6 w-8 mx-auto bg-gray-200 rounded mb-2"></div>
+                <div className="h-3 w-16 mx-auto bg-gray-200 rounded"></div>
+              </div>
+            ) : (
+              <>
+                <div className="text-xl font-light text-gray-700 mb-1">
+                  {entries.filter((e) => e.is_featured).length}
+                </div>
+                <div className="text-xs text-gray-500 uppercase tracking-wide">
+                  Featured
+                </div>
+              </>
+            )}
           </div>
+
+          {/* Locations */}
           <div className="bg-gray-50/80 rounded-2xl p-4 text-center">
-            <div className="text-xl font-light text-gray-700 mb-1">
-              {new Set(entries.map((e) => e.location).filter(Boolean)).size}
-            </div>
-            <div className="text-xs text-gray-500 uppercase tracking-wide">
-              Locations
-            </div>
+            {isLoading ? (
+              <div className="animate-pulse">
+                <div className="h-6 w-8 mx-auto bg-gray-200 rounded mb-2"></div>
+                <div className="h-3 w-20 mx-auto bg-gray-200 rounded"></div>
+              </div>
+            ) : (
+              <>
+                <div className="text-xl font-light text-gray-700 mb-1">
+                  {new Set(entries.map((e) => e.location).filter(Boolean)).size}
+                </div>
+                <div className="text-xs text-gray-500 uppercase tracking-wide">
+                  Locations
+                </div>
+              </>
+            )}
           </div>
         </div>
 
