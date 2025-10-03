@@ -7,13 +7,8 @@ export const useBlogContent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [selectedPost, setSelectedPost] = useState<BlogPost | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
   const [postContent, setPostContent] = useState<string>('');
   const [isLoadingPost, setIsLoadingPost] = useState(false);
-
-  useEffect(() => {
-    setTimeout(() => setIsLoading(false), 500);
-  }, []);
 
   // Handle URL-based navigation
   useEffect(() => {
@@ -64,7 +59,6 @@ export const useBlogContent = () => {
 
   return {
     selectedPost,
-    isLoading,
     postContent,
     isLoadingPost,
     blogPosts,

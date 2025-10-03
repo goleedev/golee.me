@@ -54,35 +54,31 @@ export const BlogPost: React.FC<BlogPostProps> = ({
               <img
                 src={post.thumbnailUrl}
                 alt={post.title}
-                className="w-full h-64 object-cover rounded-lg mb-6"
+                className="w-full max-w-full h-48 sm:h-64 object-cover rounded-lg mb-6"
               />
             )}
           </div>
 
           {isLoading ? (
-            <div className="space-y-4 animate-pulse">
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-              <div className="h-4 bg-gray-200 rounded w-4/6"></div>
-              <div className="h-8 bg-gray-200 rounded w-3/6 mt-8"></div>
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-              <div className="h-4 bg-gray-200 rounded w-4/6"></div>
-              <div className="h-64 bg-gray-200 rounded w-full my-6"></div>
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-              <div className="h-4 bg-gray-200 rounded w-full"></div>
-              <div className="h-4 bg-gray-200 rounded w-4/6"></div>
+            <div className="space-y-4">
+              <div className="h-48 sm:h-64 bg-gray-100 rounded-lg animate-pulse w-full"></div>
+              <div className="h-4 bg-gray-100 rounded w-3/4 animate-pulse"></div>
+              <div className="h-4 bg-gray-100 rounded w-5/6 animate-pulse"></div>
+              <div className="h-4 bg-gray-100 rounded w-4/6 animate-pulse"></div>
+              <div className="h-48 sm:h-64 bg-gray-100 rounded-lg animate-pulse mt-6 w-full"></div>
+              <div className="h-4 bg-gray-100 rounded w-full animate-pulse"></div>
+              <div className="h-4 bg-gray-100 rounded w-5/6 animate-pulse"></div>
             </div>
           ) : (
-            <ReactMarkdown
-              remarkPlugins={[remarkGfm]}
-              rehypePlugins={[rehypeRaw]}
-              components={markdownComponents(post.slug)}
-            >
-              {content}
-            </ReactMarkdown>
+            <div className="overflow-x-hidden">
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                rehypePlugins={[rehypeRaw]}
+                components={markdownComponents(post.slug)}
+              >
+                {content}
+              </ReactMarkdown>
+            </div>
           )}
         </article>
       </div>

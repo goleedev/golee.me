@@ -23,7 +23,6 @@ export const MentorshipContent: React.FC = () => {
         return;
       }
 
-      // 그냥 뒤집기만 하면 됨 (최신이 맨 위로)
       const reversedData = data.reverse();
 
       console.log(
@@ -47,13 +46,8 @@ export const MentorshipContent: React.FC = () => {
 
   const formatDate = (timestamp: string) => {
     try {
-      // 한국 형식 파싱: "2025. 3. 15 오후 5:33:40"
       let dateStr = timestamp;
-
-      // 한국어 시간 표시를 영어로 변환
       dateStr = dateStr.replace('오전', 'AM').replace('오후', 'PM');
-
-      // "2025. 3. 15" 형식을 "2025-03-15" 형식으로 변환
       dateStr = dateStr.replace(
         /(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/,
         (year, month, day) => {
@@ -64,7 +58,6 @@ export const MentorshipContent: React.FC = () => {
       const date = new Date(dateStr);
 
       if (isNaN(date.getTime())) {
-        // 파싱 실패시 원본에서 날짜만 추출
         const dateMatch = timestamp.match(
           /(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/
         );
@@ -87,7 +80,6 @@ export const MentorshipContent: React.FC = () => {
   return (
     <div className="px-6 pt-6 h-full overflow-auto bg-white/95 backdrop-blur-xl">
       <div className="max-w-2xl mx-auto">
-        {/* Header Section */}
         <div className="text-center mb-8">
           <h2 className="text-2xl font-light mb-2 text-gray-900">Mentorship</h2>
           <p className="text-gray-600 font-light">
@@ -95,7 +87,6 @@ export const MentorshipContent: React.FC = () => {
           </p>
         </div>
 
-        {/* Error State */}
         {error && (
           <div className="bg-red-50/90 backdrop-blur-sm rounded-2xl p-6 border border-red-200/60 mb-8">
             <div className="flex items-center space-x-2">
@@ -105,7 +96,6 @@ export const MentorshipContent: React.FC = () => {
           </div>
         )}
 
-        {/* Status Notice */}
         <div className="bg-blue-50/80 backdrop-blur-sm rounded-2xl p-6 border border-blue-200/50 mb-8">
           <p className="text-blue-800 font-light">
             <span className="font-medium">Currently unavailable</span> —
@@ -116,7 +106,6 @@ export const MentorshipContent: React.FC = () => {
 
         {isLoading ? (
           <div className="space-y-6">
-            {/* Stats Loading */}
             <div className="grid grid-cols-2 gap-4">
               {[...Array(2)].map((_, i) => (
                 <div
@@ -129,7 +118,6 @@ export const MentorshipContent: React.FC = () => {
               ))}
             </div>
 
-            {/* Entries Loading */}
             <div className="grid grid-cols-1 gap-6">
               {[...Array(3)].map((_, i) => (
                 <div
@@ -160,27 +148,27 @@ export const MentorshipContent: React.FC = () => {
           </div>
         ) : entries.length > 0 ? (
           <>
-            {/* Quick Stats */}
-            <div className="grid grid-cols-2 gap-4 mb-8">
-              <div className="bg-gray-50/80 rounded-2xl p-4 text-center">
-                <div className="text-xl font-light text-gray-700 mb-1">
-                  {entries.length}
+            {!isLoading && (
+              <div className="grid grid-cols-2 gap-4 mb-8">
+                <div className="bg-gray-50/80 rounded-2xl p-4 text-center">
+                  <div className="text-xl font-light text-gray-700 mb-1">
+                    {entries.length}
+                  </div>
+                  <div className="text-xs text-gray-500 uppercase tracking-wide">
+                    Total Sessions
+                  </div>
                 </div>
-                <div className="text-xs text-gray-500 uppercase tracking-wide">
-                  Total Sessions
+                <div className="bg-gray-50/80 rounded-2xl p-4 text-center">
+                  <div className="text-xl font-light text-gray-700 mb-1">
+                    {new Set(entries.map((e) => e.topic)).size}
+                  </div>
+                  <div className="text-xs text-gray-500 uppercase tracking-wide">
+                    Topics Covered
+                  </div>
                 </div>
               </div>
-              <div className="bg-gray-50/80 rounded-2xl p-4 text-center">
-                <div className="text-xl font-light text-gray-700 mb-1">
-                  {new Set(entries.map((e) => e.topic)).size}
-                </div>
-                <div className="text-xs text-gray-500 uppercase tracking-wide">
-                  Topics Covered
-                </div>
-              </div>
-            </div>
+            )}
 
-            {/* Entries Grid */}
             <div className="grid grid-cols-1 gap-6 mb-8">
               {entries.map((entry, index) => (
                 <div
@@ -244,7 +232,6 @@ export const MentorshipContent: React.FC = () => {
           </div>
         )}
 
-        {/* What I Offer Section */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-100 shadow-sm mb-6">
           <h3 className="font-medium text-gray-900 mb-4">What I Offer</h3>
           <div className="space-y-3">
