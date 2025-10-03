@@ -50,6 +50,7 @@ export async function onRequest(context) {
         location TEXT,
         created_at TEXT NOT NULL,
         status TEXT NOT NULL DEFAULT 'approved'
+        is_featured INTEGER DEFAULT 0
       )`
     ).run();
 

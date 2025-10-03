@@ -85,7 +85,7 @@ const Dock = ({ dockItems, windows, onDockItemClick, isMobile }: DockProps) => {
         <div className="relative px-3 py-2.5 rounded-2xl bg-[#f6f6f6]/20 backdrop-blur-lg shadow-lg border border-[#f6f6f6]/50 hover:bg-[#f6f6f6]/25 transition-all duration-300">
           <div
             className={`relative flex items-end ${
-              isMobile ? 'space-x-4' : 'space-x-3'
+              isMobile ? 'space-x-2' : 'space-x-3'
             }`}
           >
             {dockItems.map((item, index) => {
