@@ -13,7 +13,6 @@ import {
 interface GuestbookEntry {
   id: number;
   name: string;
-  email?: string;
   message: string;
   website?: string;
   location?: string;
@@ -51,7 +50,6 @@ export const GuestbookContent = () => {
   // Form state with enhanced validation
   const [formData, setFormData] = useState({
     name: '',
-    email: '',
     message: '',
     website: '',
     location: '',
@@ -79,12 +77,6 @@ export const GuestbookContent = () => {
     } catch {
       return false;
     }
-  };
-
-  // Enhanced security: Email validation
-  const isValidEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
   };
 
   // Rate limiting check
@@ -116,10 +108,6 @@ export const GuestbookContent = () => {
     }
 
     // Optional field validation
-    if (formData.email && !isValidEmail(formData.email)) {
-      errors.email = 'Please enter a valid email address';
-    }
-
     if (formData.website && !isValidUrl(formData.website)) {
       errors.website = 'Please enter a valid website URL';
     }
@@ -194,7 +182,6 @@ export const GuestbookContent = () => {
       // Sanitize all inputs
       const sanitizedData = {
         name: sanitizeInput(formData.name),
-        email: formData.email ? sanitizeInput(formData.email) : '',
         message: sanitizeInput(formData.message),
         website: formData.website ? sanitizeInput(formData.website) : '',
         location: formData.location ? sanitizeInput(formData.location) : '',
@@ -219,7 +206,6 @@ export const GuestbookContent = () => {
         // Reset form
         setFormData({
           name: '',
-          email: '',
           message: '',
           website: '',
           location: '',
@@ -284,8 +270,7 @@ export const GuestbookContent = () => {
           </p>
         </div>
 
-        {/* Summary Stats - consistent with WorkContent */}
-        {/* Summary Stats - consistent with WorkContent */}
+        {/* Summary Stats */}
         <div className="grid grid-cols-3 gap-4 mb-8">
           {/* Total Messages */}
           <div className="bg-gray-50/80 rounded-2xl p-4 text-center">
@@ -345,7 +330,7 @@ export const GuestbookContent = () => {
           </div>
         </div>
 
-        {/* Action Section - consistent with AboutContent */}
+        {/* Action Section */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-100 shadow-sm mb-6">
           <h3 className="font-medium text-gray-900 mb-4">Leave a Message</h3>
           <p className="text-gray-700 leading-relaxed font-light mb-4">
@@ -371,7 +356,7 @@ export const GuestbookContent = () => {
           </div>
         </div>
 
-        {/* Form Section - consistent styling */}
+        {/* Form Section */}
         {showForm && (
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-100 shadow-sm mb-6">
             <div className="flex items-center space-x-2 mb-4">
@@ -422,53 +407,6 @@ export const GuestbookContent = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors font-light ${
-                      formErrors.email
-                        ? 'border-red-300 bg-red-50'
-                        : 'border-gray-300'
-                    }`}
-                    placeholder="your@email.com"
-                  />
-                  {formErrors.email && (
-                    <span className="mt-1 text-sm text-red-600">
-                      {formErrors.email}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Website
-                  </label>
-                  <input
-                    type="url"
-                    name="website"
-                    value={formData.website}
-                    onChange={handleInputChange}
-                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors font-light ${
-                      formErrors.website
-                        ? 'border-red-300 bg-red-50'
-                        : 'border-gray-300'
-                    }`}
-                    placeholder="https://yourwebsite.com"
-                  />
-                  {formErrors.website && (
-                    <span className="mt-1 text-sm text-red-600">
-                      {formErrors.website}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
                     Location
                   </label>
                   <input
@@ -490,6 +428,29 @@ export const GuestbookContent = () => {
                     </span>
                   )}
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Website
+                </label>
+                <input
+                  type="url"
+                  name="website"
+                  value={formData.website}
+                  onChange={handleInputChange}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-gray-500 focus:border-transparent transition-colors font-light ${
+                    formErrors.website
+                      ? 'border-red-300 bg-red-50'
+                      : 'border-gray-300'
+                  }`}
+                  placeholder="https://yourwebsite.com"
+                />
+                {formErrors.website && (
+                  <span className="mt-1 text-sm text-red-600">
+                    {formErrors.website}
+                  </span>
+                )}
               </div>
 
               <div>
@@ -524,7 +485,7 @@ export const GuestbookContent = () => {
                 </div>
               </div>
 
-              {/* Security notice - consistent with other sections */}
+              {/* Security notice */}
               <div className="bg-gray-50/50 rounded-2xl p-4">
                 <div className="flex items-start space-x-2">
                   <Shield
@@ -564,81 +525,145 @@ export const GuestbookContent = () => {
           </div>
         )}
 
-        {/* Messages Section - consistent with WorkContent timeline */}
+        {/* Messages Section */}
         <div className="space-y-6 mb-8">
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
+            <div className="flex items-center justify-center h-[124px]">
               <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-800 rounded-full animate-spin"></div>
               <span className="ml-3 text-gray-600 font-light">
                 Loading messages...
               </span>
             </div>
           ) : entries.length > 0 ? (
-            entries.map((entry, index) => (
-              <div key={entry.id} className="relative">
-                {/* Timeline dot - consistent with WorkContent */}
-                <div className="absolute left-0 top-0 w-2 h-2 bg-gray-400 rounded-full mt-1.5"></div>
+            <>
+              {/* Featured Comments */}
+              {entries.some((e) => e.is_featured) && (
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+                    <Star
+                      size={16}
+                      className="mr-2 text-yellow-500 fill-current"
+                    />
+                    Featured Comments
+                  </h3>
+                  <div className="space-y-6">
+                    {entries
+                      .filter((entry) => entry.is_featured)
+                      .map((entry) => (
+                        <div key={entry.id} className="relative">
+                          <div className="absolute left-0 top-0 w-2 h-2 bg-yellow-400 rounded-full mt-1.5"></div>
+                          <div className="ml-8">
+                            <div className="flex justify-between items-start">
+                              <div className="flex flex-col mb-3">
+                                <div className="flex items-center space-x-2 mb-1">
+                                  <span className="font-medium text-gray-900">
+                                    {entry.name}
+                                  </span>
+                                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-yellow-100 text-yellow-800">
+                                    <Star
+                                      size={12}
+                                      className="mr-1 fill-current"
+                                    />
+                                    Featured
+                                  </span>
+                                </div>
+                                <div className="flex items-center space-x-2 text-sm text-gray-500">
+                                  {entry.location && (
+                                    <>
+                                      <span className="flex items-center space-x-1">
+                                        <MapPin size={12} />
+                                        <span>{entry.location}</span>
+                                      </span>
+                                      <span>•</span>
+                                    </>
+                                  )}
+                                  <span>{entry.timeAgo}</span>
+                                  {entry.website && (
+                                    <>
+                                      <span>•</span>
+                                      <a
+                                        href={entry.website}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center space-x-1 text-gray-600 hover:text-gray-800 transition-colors"
+                                      >
+                                        <Globe size={12} />
+                                        <span>Website</span>
+                                        <ExternalLink size={10} />
+                                      </a>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                            <p className="text-gray-700 font-light leading-relaxed mb-4 text-sm break-words">
+                              {entry.message}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
 
-                {/* Timeline line */}
-                {index < entries.length - 1 && (
-                  <div className="absolute left-0.5 top-4 w-0.5 h-full bg-gray-200"></div>
-                )}
-
-                {/* Content */}
-                <div className="ml-8">
-                  {/* Header */}
-                  <div className="flex justify-between items-start">
-                    <div className="flex flex-col mb-3">
-                      <div className="flex items-center space-x-2 mb-1">
-                        <span className="font-medium text-gray-900">
-                          {entry.name}
-                        </span>
-                        {entry.is_featured && (
-                          <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-yellow-100 text-yellow-800">
-                            <Star size={12} className="mr-1 fill-current" />
-                            Featured
-                          </span>
-                        )}
-                      </div>
-                      <div className="flex items-center space-x-2 text-sm text-gray-500">
-                        {entry.location && (
-                          <>
-                            <span className="flex items-center space-x-1">
-                              <MapPin size={12} />
-                              <span>{entry.location}</span>
-                            </span>
-                            <span>•</span>
-                          </>
-                        )}
-                        <span>{entry.timeAgo}</span>
-                        {entry.website && (
-                          <>
-                            <span>•</span>
-                            <a
-                              href={entry.website}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center space-x-1 text-gray-600 hover:text-gray-800 transition-colors"
-                            >
-                              <Globe size={12} />
-                              <span>Website</span>
-                              <ExternalLink size={10} />
-                            </a>
-                          </>
-                        )}
+              {/* Normal Comments */}
+              <div>
+                {entries
+                  .filter((entry) => !entry.is_featured)
+                  .map((entry, index) => (
+                    <div key={entry.id} className="relative">
+                      <div className="absolute left-0 top-0 w-2 h-2 bg-gray-400 rounded-full mt-1.5"></div>
+                      {index <
+                        entries.filter((e) => !e.is_featured).length - 1 && (
+                        <div className="absolute left-0.5 top-4 w-0.5 h-full bg-gray-200"></div>
+                      )}
+                      <div className="ml-8">
+                        <div className="flex justify-between items-start">
+                          <div className="flex flex-col mb-3">
+                            <div className="flex items-center space-x-2 mb-1">
+                              <span className="font-medium text-gray-900">
+                                {entry.name}
+                              </span>
+                            </div>
+                            <div className="flex items-center space-x-2 text-sm text-gray-500">
+                              {entry.location && (
+                                <>
+                                  <span className="flex items-center space-x-1">
+                                    <MapPin size={12} />
+                                    <span>{entry.location}</span>
+                                  </span>
+                                  <span>•</span>
+                                </>
+                              )}
+                              <span>{entry.timeAgo}</span>
+                              {entry.website && (
+                                <>
+                                  <span>•</span>
+                                  <a
+                                    href={entry.website}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center space-x-1 text-gray-600 hover:text-gray-800 transition-colors"
+                                  >
+                                    <Globe size={12} />
+                                    <span>Website</span>
+                                    <ExternalLink size={10} />
+                                  </a>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                        <p className="text-gray-700 font-light leading-relaxed mb-4 text-sm break-words">
+                          {entry.message}
+                        </p>
                       </div>
                     </div>
-                  </div>
-
-                  {/* Message */}
-                  <p className="text-gray-700 font-light leading-relaxed mb-4 text-sm break-words">
-                    {entry.message}
-                  </p>
-                </div>
+                  ))}
               </div>
-            ))
+            </>
           ) : (
-            <div className="text-center py-12">
+            <div className="text-center">
               <User size={48} className="text-gray-400 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">
                 No messages yet
@@ -650,7 +675,7 @@ export const GuestbookContent = () => {
           )}
         </div>
 
-        {/* Pagination - consistent styling */}
+        {/* Pagination */}
         {pagination && pagination.totalPages > 1 && (
           <div className="flex items-center justify-center space-x-2 pb-6">
             <button
@@ -698,7 +723,7 @@ export const GuestbookContent = () => {
           </div>
         )}
 
-        {/* Stats - consistent with other windows */}
+        {/* Stats */}
         {pagination && (
           <div className="text-center text-sm text-gray-500 pb-6">
             Showing {entries.length} of {pagination.total} messages
