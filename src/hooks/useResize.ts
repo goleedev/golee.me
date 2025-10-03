@@ -16,7 +16,8 @@ export const useResize = (
   setWindows: (windows: WindowState[]) => void,
   constrainSize: (size: Size, position: Position) => Size,
   constrainPosition: (pos: Position, size: Size) => Position,
-  isMobile: boolean
+  isMobile: boolean,
+  bringToFront?: (windowId: string) => void
 ) => {
   const [resizeState, setResizeState] = useState<ResizeState>({
     isResizing: false,
@@ -39,6 +40,11 @@ export const useResize = (
       const window = windows.find((w) => w.id === windowId);
       if (!window) return;
 
+      // 리사이즈 시작 시 윈도우를 앞으로 가져오기
+      if (bringToFront) {
+        bringToFront(windowId);
+      }
+
       setResizeState({
         isResizing: true,
         windowId,
@@ -48,7 +54,7 @@ export const useResize = (
         startWindowPos: window.position,
       });
     },
-    [windows, isMobile]
+    [windows, isMobile, bringToFront]
   );
 
   const handleResizeMouseMove = useCallback(

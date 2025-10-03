@@ -15,7 +15,8 @@ export const useDrag = (
     pos: Position,
     size: { width: number; height: number }
   ) => Position,
-  isMobile: boolean
+  isMobile: boolean,
+  bringToFront?: (windowId: string) => void
 ) => {
   const [dragState, setDragState] = useState<DragState>({
     isDragging: false,
@@ -34,6 +35,11 @@ export const useDrag = (
       const window = windows.find((w) => w.id === windowId);
       if (!window || window.isMaximized) return;
 
+      // 드래그 시작 시 윈도우를 앞으로 가져오기
+      if (bringToFront) {
+        bringToFront(windowId);
+      }
+
       setDragState({
         isDragging: true,
         windowId,
@@ -41,7 +47,7 @@ export const useDrag = (
         startWindowPos: window.position,
       });
     },
-    [windows, isMobile]
+    [windows, isMobile, bringToFront]
   );
 
   const handleMouseMove = useCallback(

@@ -66,7 +66,8 @@ const BagelOSPortfolio = () => {
     windows,
     setWindows,
     constrainPosition,
-    isMobile
+    isMobile,
+    bringToFront
   );
 
   const { handleResizeMouseDown } = useResize(
@@ -74,7 +75,8 @@ const BagelOSPortfolio = () => {
     setWindows,
     constrainSize,
     constrainPosition,
-    isMobile
+    isMobile,
+    bringToFront
   );
 
   const { stickies, handleStickyMouseDown } = useStickyNotes(dockHeight);
@@ -249,6 +251,7 @@ const BagelOSPortfolio = () => {
               onMinimize={minimizeWindow}
               onMaximize={maximizeWindow}
               onResizeMouseDown={handleResizeMouseDown}
+              onBringToFront={bringToFront}
               isMobile={isMobile}
             />
           </div>

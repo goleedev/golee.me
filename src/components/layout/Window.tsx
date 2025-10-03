@@ -12,6 +12,7 @@ interface WindowProps {
     windowId: string,
     direction: string
   ) => void;
+  onBringToFront: (windowId: string) => void;
   isMobile: boolean;
 }
 
@@ -22,6 +23,7 @@ const Window = ({
   onMinimize,
   onMaximize,
   onResizeMouseDown,
+  onBringToFront,
   isMobile,
 }: WindowProps) => (
   <div
@@ -44,9 +46,12 @@ const Window = ({
       willChange: 'transform',
       transition: 'none',
     }}
-    onMouseDown={(e) =>
-      !window.isMinimized && !isMobile && onMouseDown(e, window.id)
-    }
+    onMouseDown={(e) => {
+      if (!window.isMinimized && !isMobile) {
+        onBringToFront(window.id);
+        onMouseDown(e, window.id);
+      }
+    }}
   >
     {/* Title bar with resize handles */}
     <div
@@ -143,6 +148,11 @@ const Window = ({
       className="overflow-auto relative"
       style={{
         height: isMobile ? `calc(100% - 48px)` : `calc(100% - 33px)`,
+      }}
+      onMouseDown={(e) => {
+        if (!window.isMinimized && !isMobile) {
+          onBringToFront(window.id);
+        }
       }}
     >
       {window.content}
