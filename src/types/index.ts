@@ -21,7 +21,7 @@ export type WindowState = {
   size: Size;
   originalPosition?: Position;
   originalSize?: Size;
-  wasAutoMaximized?: boolean; // Track if window was auto-maximized due to screen size
+  wasAutoMaximized?: boolean;
 };
 
 export type Track = {
@@ -57,10 +57,14 @@ export interface IconDragState {
   startIconPos: Position;
 }
 
+// 이 부분이 변경됨
 export type StickyState = {
   id: string;
+  type: 'analytics' | 'privacy';
   position: Position;
   zIndex: number;
+  isExpanded?: boolean;
+  originalPosition?: Position;
 };
 
 export interface StickyDragState {

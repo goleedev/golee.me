@@ -83,8 +83,8 @@ const BagelOSPortfolio = () => {
     bringToFront
   );
 
-  const { stickies, handleStickyMouseDown } = useStickyNotes(dockHeight);
-
+  const { stickies, handleStickyMouseDown, handleToggleExpand } =
+    useStickyNotes(dockHeight, isMobile);
   const { iconDragState, hasDraggedIcon, handleIconMouseDown } = useIconDrag(
     setDesktopIconPositions,
     dockHeight
@@ -215,8 +215,9 @@ const BagelOSPortfolio = () => {
           sticky={sticky}
           onMouseDown={(e) => {
             e.stopPropagation();
-            handleStickyMouseDown(e, sticky.id, sticky.position);
+            handleStickyMouseDown(e, sticky.id);
           }}
+          onToggleExpand={handleToggleExpand}
           isMobile={isMobile}
         />
       ))}

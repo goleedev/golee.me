@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import type { StickyState } from '../../types';
+import { PrivacySticky } from './PrivacySticky';
+import { AnalyticsSticky } from './AnalyticsSticky';
 
-interface MetricsData {
+export interface MetricsData {
   todaysViews: number;
   totalViews: number;
   totalCountries: number;
@@ -12,13 +14,19 @@ interface MetricsData {
 interface StickiesProps {
   sticky: StickyState;
   onMouseDown: (e: React.MouseEvent, stickyId: string) => void;
+  onToggleExpand: (stickyId: string) => void;
   isMobile: boolean;
 }
 
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
+const CACHE_DURATION = 5 * 60 * 1000;
 const CACHE_KEY = 'analytics_cache';
 
-const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
+const Stickies: React.FC<StickiesProps> = ({
+  sticky,
+  onMouseDown,
+  onToggleExpand,
+  isMobile,
+}) => {
   const [metrics, setMetrics] = useState<MetricsData>({
     todaysViews: 0,
     totalViews: 0,
@@ -29,8 +37,9 @@ const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const fetchMetrics = async () => {
+    if (sticky.type !== 'analytics') return;
+
     try {
-      // Check cache first
       const cached = localStorage.getItem(CACHE_KEY);
       if (cached) {
         try {
@@ -38,7 +47,6 @@ const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
           if (Date.now() - timestamp < CACHE_DURATION) {
             setMetrics(data);
             setIsLoading(false);
-            console.log('Analytics: Using cached data');
             return;
           }
         } catch {
@@ -63,8 +71,6 @@ const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
 
       if (result.success) {
         setMetrics(result.data);
-
-        // Cache the result
         localStorage.setItem(
           CACHE_KEY,
           JSON.stringify({
@@ -72,70 +78,92 @@ const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
             timestamp: Date.now(),
           })
         );
-        console.log('Analytics: Data fetched and cached');
-      } else {
-        console.error('Failed to fetch analytics:', result.error);
-        setMetrics({
-          todaysViews: 0,
-          totalViews: 0,
-          totalCountries: 0,
-          topCountry: '--',
-          lastVisitor: '--',
-        });
       }
     } catch (error) {
       console.error('Analytics Error:', error);
-      setMetrics({
-        todaysViews: 0,
-        totalViews: 0,
-        totalCountries: 0,
-        topCountry: '--',
-        lastVisitor: '--',
-      });
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchMetrics();
+    if (sticky.type === 'analytics') {
+      fetchMetrics();
+      const interval = setInterval(fetchMetrics, CACHE_DURATION);
+      return () => clearInterval(interval);
+    }
+  }, [sticky.type]);
 
-    // Auto-refresh every 5 minutes (same as cache duration)
-    const interval = setInterval(fetchMetrics, CACHE_DURATION);
-    return () => clearInterval(interval);
-  }, []);
+  const getStickyColor = () => {
+    switch (sticky.type) {
+      case 'analytics':
+        return '#fef08a';
+      case 'privacy':
+        return '#BEF4F8';
+      default:
+        return '#fef08a';
+    }
+  };
+
+  const getBorderColor = () => {
+    switch (sticky.type) {
+      case 'analytics':
+        return 'border-yellow-300/50';
+      case 'privacy':
+        return 'border-cyan-300/50';
+      default:
+        return 'border-yellow-300/50';
+    }
+  };
+
+  const getStickySize = () => {
+    if (sticky.isExpanded) {
+      return {
+        width: 'calc(100vw - 32px)',
+        height: 'auto',
+        maxHeight: isMobile ? 'calc(100vh - 140px)' : 'calc(100vh - 120px)',
+      };
+    }
+    return {
+      width: '264px',
+      height:
+        sticky.type === 'privacy' && !isMobile
+          ? '168px'
+          : sticky.type === 'privacy' && isMobile
+          ? '182px'
+          : '208px',
+    };
+  };
+
+  const size = getStickySize();
 
   return (
     <div
-      className="absolute bg-yellow-200 w-64 h-52 shadow-sm border border-yellow-300/50 p-4 select-none"
+      className={`absolute shadow-sm border p-4 select-none ${getBorderColor()} ${
+        sticky.isExpanded ? 'overflow-y-auto' : ''
+      }`}
       style={{
         left: sticky.position.x,
         top: sticky.position.y,
         zIndex: sticky.zIndex,
-        backgroundColor: '#fef08a',
+        backgroundColor: getStickyColor(),
         fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif',
-        cursor: isMobile ? 'default' : 'move',
+        cursor: isMobile || sticky.isExpanded ? 'default' : 'move',
+        ...size,
       }}
-      onMouseDown={(e) => !isMobile && onMouseDown(e, sticky.id)}
+      onMouseDown={(e) =>
+        !isMobile && !sticky.isExpanded && onMouseDown(e, sticky.id)
+      }
     >
       <div className="text-xs leading-relaxed pointer-events-none">
-        <span className="font-semibold">🔍 Analytics</span>
-        <br />
-        <br />
-        {isLoading ? (
-          <div className="h-[78px] flex items-center">Loading...</div>
+        {sticky.type === 'analytics' ? (
+          <AnalyticsSticky metrics={metrics} isLoading={isLoading} />
         ) : (
-          <>
-            · Today's views: {metrics.todaysViews.toLocaleString() || '--'}
-            <br />· Total views: {metrics.totalViews.toLocaleString() || '--'}
-            <br />· Total countries: {metrics.totalCountries || '--'}
-            <br />· Top country: {metrics.topCountry || '--'}
-            <br />· Last visitor: {metrics.lastVisitor || '--'}
-          </>
+          <PrivacySticky
+            isExpanded={sticky.isExpanded || false}
+            onToggleExpand={() => onToggleExpand(sticky.id)}
+          />
         )}
-        <br />
-        <br />
-        Powered by Cloudflare D1
       </div>
     </div>
   );
