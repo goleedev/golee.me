@@ -19,7 +19,7 @@ interface GuestbookEntry {
   location?: string;
   created_at: string;
   timeAgo: string;
-  is_featured: boolean;
+  is_featured: number;
 }
 
 interface GuestbookData {
@@ -279,7 +279,7 @@ export const GuestbookContent = () => {
             isLoading={isLoading}
           />
           <StatCard
-            metric={entries.filter((e) => e.is_featured).length}
+            metric={entries.filter((e) => e.is_featured === 1).length}
             label="Featured"
             isLoading={isLoading}
           />
@@ -499,7 +499,7 @@ export const GuestbookContent = () => {
           ) : entries.length > 0 ? (
             <>
               {/* Featured Comments */}
-              {entries.some((e) => e.is_featured) && (
+              {entries.some((e) => e.is_featured === 1) && (
                 <div>
                   <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
                     <Star
@@ -510,7 +510,7 @@ export const GuestbookContent = () => {
                   </h3>
                   <div className="space-y-6">
                     {entries
-                      .filter((entry) => entry.is_featured)
+                      .filter((entry) => entry.is_featured === 1)
                       .map((entry) => (
                         <div key={entry.id} className="relative">
                           <div className="absolute left-0 top-0 w-2 h-2 bg-yellow-400 rounded-full mt-1.5"></div>
@@ -539,7 +539,9 @@ export const GuestbookContent = () => {
                                       <span>•</span>
                                     </>
                                   )}
-                                  <span>{entry.timeAgo}</span>
+                                  {entry.timeAgo && (
+                                    <span>{entry.timeAgo}</span>
+                                  )}
                                   {entry.website && (
                                     <>
                                       <span>•</span>
@@ -571,12 +573,13 @@ export const GuestbookContent = () => {
               {/* Normal Comments */}
               <div>
                 {entries
-                  .filter((entry) => !entry.is_featured)
+                  .filter((entry) => entry.is_featured !== 1)
                   .map((entry, index) => (
                     <div key={entry.id} className="relative">
                       <div className="absolute left-0 top-0 w-2 h-2 bg-gray-400 rounded-full mt-1.5"></div>
                       {index <
-                        entries.filter((e) => !e.is_featured).length - 1 && (
+                        entries.filter((e) => e.is_featured !== 1).length -
+                          1 && (
                         <div className="absolute left-0.5 top-4 w-0.5 h-full bg-gray-200"></div>
                       )}
                       <div className="ml-8">

@@ -57,7 +57,7 @@ export async function onRequest(context) {
     // GET request - Fetch guestbook entries
     if (request.method === 'GET') {
       const entries = await env.DB.prepare(
-        `SELECT id, name, message, email, website, location, created_at, status 
+        `SELECT id, name, message, email, website, location, created_at, status, is_featured 
          FROM guestbook_entries 
          WHERE status = ? 
          ORDER BY created_at DESC 
