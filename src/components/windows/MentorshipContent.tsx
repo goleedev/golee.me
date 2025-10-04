@@ -4,6 +4,7 @@ import {
   getMentorshipData,
   type MentorshipEntry,
 } from '../../services/mentorshipService';
+import { StatCard } from '../shared/StatCard';
 
 export const MentorshipContent: React.FC = () => {
   const [entries, setEntries] = useState<MentorshipEntry[]>([]);
@@ -107,15 +108,8 @@ export const MentorshipContent: React.FC = () => {
         {isLoading ? (
           <div className="space-y-6">
             <div className="grid grid-cols-2 gap-4">
-              {[...Array(2)].map((_, i) => (
-                <div
-                  key={i}
-                  className="bg-gray-50/80 rounded-2xl p-4 animate-pulse"
-                >
-                  <div className="h-6 bg-gray-200 rounded w-8 mx-auto mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-16 mx-auto"></div>
-                </div>
-              ))}
+              <StatCard metric={0} label="Total Sessions" isLoading={true} />
+              <StatCard metric={0} label="Topics Covered" isLoading={true} />
             </div>
 
             <div className="grid grid-cols-1 gap-6">
@@ -148,26 +142,18 @@ export const MentorshipContent: React.FC = () => {
           </div>
         ) : entries.length > 0 ? (
           <>
-            {!isLoading && (
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                <div className="bg-gray-50/80 rounded-2xl p-4 text-center">
-                  <div className="text-xl font-light text-gray-700 mb-1">
-                    {entries.length}
-                  </div>
-                  <div className="text-xs text-gray-500 uppercase tracking-wide">
-                    Total Sessions
-                  </div>
-                </div>
-                <div className="bg-gray-50/80 rounded-2xl p-4 text-center">
-                  <div className="text-xl font-light text-gray-700 mb-1">
-                    {new Set(entries.map((e) => e.topic)).size}
-                  </div>
-                  <div className="text-xs text-gray-500 uppercase tracking-wide">
-                    Topics Covered
-                  </div>
-                </div>
-              </div>
-            )}
+            <div className="grid grid-cols-2 gap-4 mb-8">
+              <StatCard
+                metric={entries.length}
+                label="Total Sessions"
+                isLoading={isLoading}
+              />
+              <StatCard
+                metric={new Set(entries.map((e) => e.topic)).size}
+                label="Topics Covered"
+                isLoading={isLoading}
+              />
+            </div>
 
             <div className="grid grid-cols-1 gap-6 mb-8">
               {entries.map((entry, index) => (
