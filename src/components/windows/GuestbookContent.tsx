@@ -313,7 +313,7 @@ export const GuestbookContent = () => {
         <div className="grid grid-cols-3 gap-4 mb-8">
           <StatCard
             metric={pagination?.total || 0}
-            label="Total Messages"
+            label="Total Comments"
             isLoading={isLoading}
           />
           <StatCard
@@ -332,10 +332,10 @@ export const GuestbookContent = () => {
 
         {/* Action Section */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-100 shadow-sm mb-6">
-          <h3 className="font-medium text-gray-900 mb-4">Leave a Message</h3>
+          <h3 className="font-medium text-gray-900 mb-4">Leave a Comment</h3>
           <p className="text-gray-700 leading-relaxed font-light mb-4">
             I'd love to hear your thoughts, feedback, or just a friendly hello!
-            Messages are published immediately and help create a welcoming
+            Comments are published immediately and help create a welcoming
             community.
           </p>
           <div className="flex space-x-3">
@@ -344,7 +344,7 @@ export const GuestbookContent = () => {
               className="bg-gray-900 text-white px-6 py-2 rounded-lg hover:bg-gray-800 transition-colors font-light flex items-center space-x-2"
             >
               <Send size={16} />
-              <span>{showForm ? 'Hide Form' : 'Sign Guest Book'}</span>
+              <span>{showForm ? 'Hide Form' : 'Leave a Comment'}</span>
             </button>
             <button
               onClick={() => fetchEntries(page)}
@@ -360,7 +360,7 @@ export const GuestbookContent = () => {
         {showForm && (
           <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-gray-100 shadow-sm mb-6">
             <div className="flex items-center space-x-2 mb-4">
-              <h3 className="font-medium text-gray-900">New Message</h3>
+              <h3 className="font-medium text-gray-900">New Comment</h3>
               <Shield size={16} className="text-green-500" />
             </div>
 
@@ -722,7 +722,7 @@ export const GuestbookContent = () => {
         {/* Stats */}
         {pagination && (
           <div className="text-center text-sm text-gray-500 pb-6">
-            Showing {entries.length} of {pagination.total} messages
+            Showing {entries.length} of {pagination.total} comments
           </div>
         )}
       </div>
