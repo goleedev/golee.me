@@ -28,7 +28,7 @@ export const StatCard: React.FC<StatCardProps> = ({
 
   return (
     <div
-      className={`h-full flex flex-col justify-center bg-gray-50/80 rounded-2xl p-3 sm:p-4 text-center ${className}`}
+      className={`h-[72px] sm:h-full flex flex-col justify-center bg-gray-50/80 rounded-2xl p-3 sm:p-4 text-center ${className}`}
     >
       <div className="text-base sm:text-xl font-light text-gray-700 mb-1">
         {metric}
