@@ -97,9 +97,12 @@ body {
     scroll-behavior: smooth;
   }
 
-  /* Hide hover effects on mobile */
-  .group:hover .tooltip {
-    opacity: 0 !important;
+  /* Mobile tooltip control */
+  @media (max-width: 768px) {
+    /* Only hide tooltips on hover, not on click */
+    .dock-item:hover .tooltip:not([style*='opacity: 1']) {
+      opacity: 0;
+    }
   }
 
   /* Mobile-specific animations */
@@ -257,4 +260,21 @@ button:focus-visible,
 .dock-item:focus-visible {
   outline: 2px solid #007aff;
   outline-offset: 2px;
+}
+
+.dock-item:hover .tooltip {
+  opacity: 0.6 !important;
+  transform: translateY(0) translateX(-50%) !important;
+}
+
+/* Desktop-specific tooltip styles */
+@media (min-width: 769px) {
+  .dock-item .tooltip {
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .dock-item:hover .tooltip {
+    opacity: 1;
+    transform: translateY(0) translateX(-50%);
+  }
 }

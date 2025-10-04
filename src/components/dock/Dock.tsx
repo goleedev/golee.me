@@ -3,7 +3,6 @@ import FolderIcon from '../shared/icons/FolderIcon';
 import MusicIcon from '../shared/icons/MusicIcon';
 import NoteIcon from '../shared/icons/NoteIcon';
 
-// Icon Component - Folder style with consistent colors
 const createIconComponent = (itemId: string) => {
   const folderIcons = {
     about: <NoteIcon />,
@@ -39,7 +38,6 @@ const DockItemComponent = ({
     data-index={index}
     onClick={() => onClick(item.id)}
   >
-    {/* Icon Only - No hover effects */}
     <div
       className="relative dock-app-icon"
       style={{
@@ -52,21 +50,29 @@ const DockItemComponent = ({
       </div>
     </div>
 
-    {/* Active/Minimized indicator dot */}
     {(isActive || isMinimized) && (
       <div className="absolute bottom-[-6px] w-1 h-1 rounded-full bg-black/40" />
     )}
 
-    {/* Tooltip - Only shows on hover */}
+    {/* Tooltip - desktop only */}
     <div
-      className="tooltip absolute bottom-full mb-6 px-3 py-2 bg-gray-900/90 text-white text-xs rounded-lg opacity-0 transition-all duration-300 pointer-events-none whitespace-nowrap backdrop-blur-sm shadow-lg"
+      className="tooltip absolute bottom-full mb-6 px-3 py-2 bg-gray-900/90 text-white text-xs rounded-lg opacity-0 transition-all duration-300 pointer-events-none whitespace-nowrap backdrop-blur-sm shadow-lg hidden md:block"
       style={{
-        transform: 'translateY(10px) translateX(-50%)',
         left: '50%',
+        transform: 'translateX(-50%) translateY(10px)',
       }}
     >
       {item.title}
-      <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900/90" />
+      <div
+        className="absolute top-full w-0 h-0"
+        style={{
+          left: '50%',
+          transform: 'translateX(-50%)',
+          borderLeft: '4px solid transparent',
+          borderRight: '4px solid transparent',
+          borderTop: '4px solid rgba(17, 24, 39, 0.9)',
+        }}
+      />
     </div>
   </div>
 );
@@ -110,7 +116,6 @@ const Dock = ({ dockItems, windows, onDockItemClick, isMobile }: DockProps) => {
           </div>
         </div>
 
-        {/* Dock reflection effect */}
         <div className="absolute top-full left-0 right-0 h-2 bg-gradient-to-b from-white/5 to-transparent rounded-b-2xl"></div>
       </div>
     </div>
