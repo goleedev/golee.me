@@ -168,17 +168,17 @@ export const CommunityContent = () => {
                         {getEventTypeLabel(event.type)}
                       </span>
                     </div>
-                    <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500 mt-0.5">
+                    <div className="flex flex-row items-center gap-1 sm:gap-2 text-xs sm:text-sm text-gray-500 mt-0.5">
                       {event.location && (
                         <>
                           <span>{event.location}</span>
-                          <span className="hidden sm:inline">•</span>
+                          <span>•</span>
                         </>
                       )}
                       <span>{event.date}</span>
                       {event.attendees && (
                         <>
-                          <span className="hidden sm:inline">•</span>
+                          <span>•</span>
                           <span>
                             {event.attendees.toLocaleString()} participants
                           </span>
@@ -188,7 +188,7 @@ export const CommunityContent = () => {
                   </div>
                   {index === 0 && (
                     <div className="mt-2 sm:mt-0">
-                      <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-black/80 text-white">
+                      <span className="px-2 py-0.5 rounded text-xs font-medium bg-gray-800/50 text-white whitespace-nowrap">
                         Recent
                       </span>
                     </div>

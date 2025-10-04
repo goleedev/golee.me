@@ -118,7 +118,7 @@ export const WorkContent = () => {
               achievements={exp.achievements}
               tags={exp.technologies}
               isLast={index === experiences.length - 1}
-              isFeatured={exp.isCurrent}
+              isCurrent={exp.isCurrent}
             />
           ))}
         </div>

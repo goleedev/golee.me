@@ -227,7 +227,7 @@ export const ActivitiesContent = () => {
                             {activity.title}
                           </span>
                           {activity.featured && (
-                            <span className="px-2 py-0.5 rounded text-xs font-medium bg-black/80 text-white whitespace-nowrap">
+                            <span className="px-2 py-0.5 rounded text-xs font-medium bg-gray-800/50 text-white whitespace-nowrap">
                               Featured
                             </span>
                           )}

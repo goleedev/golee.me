@@ -9,6 +9,7 @@ interface TimelineItemProps {
   achievements?: string[];
   isLast?: boolean;
   isFeatured?: boolean;
+  isCurrent?: boolean;
   children?: React.ReactNode;
 }
 
@@ -21,6 +22,7 @@ export const TimelineItem: React.FC<TimelineItemProps> = ({
   achievements = [],
   isLast = false,
   isFeatured = false,
+  isCurrent = false,
   children,
 }) => {
   return (
@@ -42,8 +44,13 @@ export const TimelineItem: React.FC<TimelineItemProps> = ({
               <h3 className="text-lg sm:text-xl font-medium text-gray-900">
                 {title}
               </h3>
-              {isFeatured && (
-                <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-black/80 text-white whitespace-nowrap">
+              {isCurrent && (
+                <span className="px-2 py-0.5 rounded text-xs font-medium bg-gray-800/50 text-white whitespace-nowrap">
+                  Current
+                </span>
+              )}
+              {isFeatured && !isCurrent && (
+                <span className="px-2 py-0.5 rounded text-xs font-medium bg-gray-800/50 text-white whitespace-nowrap">
                   Featured
                 </span>
               )}
