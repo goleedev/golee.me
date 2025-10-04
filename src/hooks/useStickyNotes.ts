@@ -9,6 +9,10 @@ interface StickyDragState {
   startStickyPos: Position;
 }
 
+const STICKY_WIDTH = 256;
+const STICKY_HEIGHT = 208;
+const STICKY_MARGIN = 0;
+
 export const useStickyNotes = (dockHeight: number) => {
   const [stickies, setStickies] = useState<StickyState[]>([]);
   const [stickyDragState, setStickyDragState] = useState<StickyDragState>({
@@ -50,10 +54,16 @@ export const useStickyNotes = (dockHeight: number) => {
       };
 
       const constrainedPosition = {
-        x: Math.max(0, Math.min(newPosition.x, window.innerWidth - 256)),
+        x: Math.max(
+          0,
+          Math.min(newPosition.x, window.innerWidth - STICKY_WIDTH)
+        ),
         y: Math.max(
           40,
-          Math.min(newPosition.y, window.innerHeight - dockHeight - 288)
+          Math.min(
+            newPosition.y,
+            window.innerHeight - dockHeight - STICKY_HEIGHT - STICKY_MARGIN
+          )
         ),
       };
 
