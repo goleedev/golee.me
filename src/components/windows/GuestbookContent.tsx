@@ -1,10 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import {
   Send,
   User,
   Globe,
   MapPin,
-  Star,
   RefreshCw,
   Shield,
   ExternalLink,
@@ -58,6 +57,32 @@ export const GuestbookContent = () => {
 
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [lastSubmitTime, setLastSubmitTime] = useState<number>(0);
+
+  // Time ago calculation
+  const getTimeAgo = useCallback((dateString: string): string => {
+    const now = new Date();
+    const date = new Date(dateString);
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (diffInSeconds < 60) {
+      return 'just now';
+    } else if (diffInSeconds < 3600) {
+      const minutes = Math.floor(diffInSeconds / 60);
+      return `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+    } else if (diffInSeconds < 86400) {
+      const hours = Math.floor(diffInSeconds / 3600);
+      return `${hours} hour${hours === 1 ? '' : 's'} ago`;
+    } else if (diffInSeconds < 2592000) {
+      const days = Math.floor(diffInSeconds / 86400);
+      return `${days} day${days === 1 ? '' : 's'} ago`;
+    } else if (diffInSeconds < 31536000) {
+      const months = Math.floor(diffInSeconds / 2592000);
+      return `${months} month${months === 1 ? '' : 's'} ago`;
+    } else {
+      const years = Math.floor(diffInSeconds / 31536000);
+      return `${years} year${years === 1 ? '' : 's'} ago`;
+    }
+  }, []);
 
   // Enhanced security: Input sanitization
   const sanitizeInput = (input: string): string => {
@@ -127,46 +152,59 @@ export const GuestbookContent = () => {
   };
 
   // Fetch guestbook entries
-  const fetchEntries = async (pageNum: number = 1) => {
-    try {
-      setIsLoading(true);
-      const response = await fetch(`/api/guestbook?page=${pageNum}&limit=10`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+  const fetchEntries = useCallback(
+    async (pageNum: number = 1) => {
+      try {
+        setIsLoading(true);
+        const response = await fetch(
+          `/api/guestbook?page=${pageNum}&limit=10`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          }
+        );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-      const result = await response.json();
+        const result = await response.json();
 
-      if (result.success) {
-        setEntries(result.data.entries);
-        setPagination(result.data.pagination);
-      } else {
-        console.error('Failed to fetch entries:', result.error);
+        if (result.success) {
+          // Add timeAgo to each entry
+          const entriesWithTimeAgo = result.data.entries.map(
+            (entry: GuestbookEntry) => ({
+              ...entry,
+              timeAgo: getTimeAgo(entry.created_at),
+            })
+          );
+          setEntries(entriesWithTimeAgo);
+          setPagination(result.data.pagination);
+        } else {
+          console.error('Failed to fetch entries:', result.error);
+          setSubmitMessage({
+            type: 'error',
+            text: 'Failed to load entries. Please refresh the page.',
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching guestbook entries:', error);
         setSubmitMessage({
           type: 'error',
-          text: 'Failed to load entries. Please refresh the page.',
+          text: 'Failed to load entries. Please check your connection.',
         });
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Error fetching guestbook entries:', error);
-      setSubmitMessage({
-        type: 'error',
-        text: 'Failed to load entries. Please check your connection.',
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    },
+    [getTimeAgo]
+  );
 
   useEffect(() => {
     fetchEntries(page);
-  }, [page]);
+  }, [page, fetchEntries]);
 
   // Enhanced form submission with security measures
   const handleSubmit = async (e: React.FormEvent) => {
@@ -501,11 +539,7 @@ export const GuestbookContent = () => {
               {/* Featured Comments */}
               {entries.some((e) => e.is_featured === 1) && (
                 <div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                    <Star
-                      size={16}
-                      className="mr-2 text-yellow-500 fill-current"
-                    />
+                  <h3 className="text-lg font-medium text-gray-900 mb-4">
                     Featured Comments
                   </h3>
                   <div className="space-y-6">
@@ -513,7 +547,7 @@ export const GuestbookContent = () => {
                       .filter((entry) => entry.is_featured === 1)
                       .map((entry) => (
                         <div key={entry.id} className="relative">
-                          <div className="absolute left-0 top-0 w-2 h-2 bg-yellow-400 rounded-full mt-1.5"></div>
+                          <div className="absolute left-0 top-0 w-2 h-2 bg-gray-400 rounded-full mt-1.5"></div>
                           <div className="ml-8">
                             <div className="flex justify-between items-start">
                               <div className="flex flex-col mb-3">
@@ -521,11 +555,7 @@ export const GuestbookContent = () => {
                                   <span className="font-medium text-gray-900">
                                     {entry.name}
                                   </span>
-                                  <span className="inline-flex items-center px-2 py-1 rounded-md text-xs font-medium bg-yellow-100 text-yellow-800">
-                                    <Star
-                                      size={12}
-                                      className="mr-1 fill-current"
-                                    />
+                                  <span className="px-2 py-0.5 rounded text-xs font-medium bg-gray-800/50 text-white whitespace-nowrap">
                                     Featured
                                   </span>
                                 </div>
@@ -567,6 +597,7 @@ export const GuestbookContent = () => {
                         </div>
                       ))}
                   </div>
+                  <hr className="mt-6 border-gray-200" />
                 </div>
               )}
 
