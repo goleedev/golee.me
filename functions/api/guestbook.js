@@ -49,7 +49,7 @@ export async function onRequest(context) {
         website TEXT,
         location TEXT,
         created_at TEXT NOT NULL,
-        status TEXT NOT NULL DEFAULT 'approved'
+        status TEXT NOT NULL DEFAULT 'approved',
         is_featured INTEGER DEFAULT 0
       )`
     ).run();
