@@ -57,6 +57,36 @@ async function hashFingerprint(userAgent, salt) {
     .substring(0, 16);
 }
 
+async function migrateTableStructure(DB) {
+  try {
+    const tableInfo = await DB.prepare(
+      `PRAGMA table_info(analytics_visits)`
+    ).all();
+    const hasFingerprint = tableInfo.results?.some(
+      (col) => col.name === 'fingerprint'
+    );
+
+    if (!hasFingerprint) {
+      console.log('Adding fingerprint column to analytics_visits...');
+      await DB.prepare(
+        `ALTER TABLE analytics_visits ADD COLUMN fingerprint TEXT`
+      ).run();
+      await DB.prepare(
+        `CREATE INDEX IF NOT EXISTS idx_fingerprint ON analytics_visits(fingerprint)`
+      ).run();
+      console.log('Fingerprint column added successfully');
+    }
+
+    await DB.prepare(
+      `CREATE INDEX IF NOT EXISTS idx_visited_at ON analytics_visits(visited_at)`
+    ).run();
+
+    console.log('Table migration completed');
+  } catch (error) {
+    console.error('Migration error:', error);
+  }
+}
+
 export async function onRequest(context) {
   const { request, env } = context;
 
@@ -72,6 +102,7 @@ export async function onRequest(context) {
 
   try {
     if (!env.DB) {
+      console.error('D1 database not bound');
       return new Response(
         JSON.stringify({
           success: false,
@@ -84,15 +115,42 @@ export async function onRequest(context) {
       );
     }
 
-    // POST - Track visit with privacy-first approach
+    await env.DB.prepare(
+      `CREATE TABLE IF NOT EXISTS analytics_visits (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        country TEXT,
+        referrer TEXT,
+        visited_at TEXT,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP
+      )`
+    ).run();
+
+    await migrateTableStructure(env.DB);
+
     if (request.method === 'POST') {
       try {
         const userAgent = request.headers.get('User-Agent') || 'unknown';
-
-        // Use environment variable for salt, with secure fallback
-        const salt = env.ANALYTICS_SALT || 'fallback-' + crypto.randomUUID();
+        const salt = env.ANALYTICS_SALT || 'default-analytics-salt-2025';
 
         const fingerprint = await hashFingerprint(userAgent, salt);
+
+        const countryCode = request.headers.get('CF-IPCountry') || 'XX';
+        const country =
+          countryCode !== 'XX' ? getCountryName(countryCode) : 'Unknown';
+
+        let referrer = 'Direct';
+        try {
+          const body = await request.json();
+          referrer = body.referrer || 'Direct';
+        } catch (e) {
+          referrer = request.headers.get('Referer') || 'Direct';
+        }
+
+        console.log('Analytics POST:', {
+          country,
+          countryCode,
+          fingerprint: fingerprint.substring(0, 8),
+        });
 
         const recentVisit = await env.DB.prepare(
           `SELECT id FROM analytics_visits 
@@ -103,8 +161,8 @@ export async function onRequest(context) {
           .bind(fingerprint)
           .first();
 
-        // Skip if already tracked recently (reduces DB writes)
         if (recentVisit) {
+          console.log('Analytics: Duplicate visit skipped');
           return new Response(
             JSON.stringify({
               success: true,
@@ -116,44 +174,8 @@ export async function onRequest(context) {
           );
         }
 
-        // Get country from Cloudflare headers
-        // This is aggregated data and privacy-compliant
-        const countryCode = request.headers.get('CF-IPCountry') || 'Unknown';
-        const country =
-          countryCode !== 'Unknown' ? getCountryName(countryCode) : 'Unknown';
-
-        let referrer = 'Direct';
-        try {
-          const body = await request.json();
-          referrer = body.referrer || 'Direct';
-        } catch (e) {
-          referrer = request.headers.get('Referer') || 'Direct';
-        }
-
         const timestamp = new Date().toISOString();
 
-        // Create analytics table with indexes
-        await env.DB.prepare(
-          `CREATE TABLE IF NOT EXISTS analytics_visits (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            country TEXT,
-            referrer TEXT,
-            fingerprint TEXT,
-            visited_at TEXT,
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP
-          )`
-        ).run();
-
-        // Create indexes for performance (will only create if they don't exist)
-        await env.DB.prepare(
-          `CREATE INDEX IF NOT EXISTS idx_fingerprint ON analytics_visits(fingerprint)`
-        ).run();
-
-        await env.DB.prepare(
-          `CREATE INDEX IF NOT EXISTS idx_visited_at ON analytics_visits(visited_at)`
-        ).run();
-
-        // Insert visit with anonymized data only
         await env.DB.prepare(
           `INSERT INTO analytics_visits (country, referrer, fingerprint, visited_at)
            VALUES (?, ?, ?, ?)`
@@ -161,10 +183,13 @@ export async function onRequest(context) {
           .bind(country, referrer, fingerprint, timestamp)
           .run();
 
+        console.log('Analytics: Visit tracked');
+
         return new Response(
           JSON.stringify({
             success: true,
             message: 'Visit tracked',
+            country: country,
           }),
           {
             headers: { 'Content-Type': 'application/json', ...corsHeaders },
@@ -176,6 +201,7 @@ export async function onRequest(context) {
           JSON.stringify({
             success: false,
             error: 'Failed to track visit',
+            details: error.message,
           }),
           {
             status: 500,
@@ -185,37 +211,19 @@ export async function onRequest(context) {
       }
     }
 
-    // GET - Get analytics data with caching
     if (request.method === 'GET') {
       try {
-        // Ensure table exists
-        await env.DB.prepare(
-          `CREATE TABLE IF NOT EXISTS analytics_visits (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            country TEXT,
-            referrer TEXT,
-            fingerprint TEXT,
-            visited_at TEXT,
-            created_at TEXT DEFAULT CURRENT_TIMESTAMP
-          )`
-        ).run();
-
-        // Get today's views
-        const today = new Date().toISOString().split('T')[0];
+        // ✅ FIX: Use SQLite's DATE('now') for consistent timezone handling
         const todayViews = await env.DB.prepare(
           `SELECT COUNT(*) as count 
            FROM analytics_visits 
-           WHERE DATE(visited_at) = ?`
-        )
-          .bind(today)
-          .first();
+           WHERE DATE(visited_at) = DATE('now')`
+        ).first();
 
-        // Get total pageviews
         const totalViews = await env.DB.prepare(
           `SELECT COUNT(*) as count FROM analytics_visits`
         ).first();
 
-        // Get top 10 countries only (reduced from all)
         const countries = await env.DB.prepare(
           `SELECT country, COUNT(*) as count 
            FROM analytics_visits 
@@ -225,14 +233,12 @@ export async function onRequest(context) {
            LIMIT 10`
         ).all();
 
-        // Get last visit
         const lastVisit = await env.DB.prepare(
           `SELECT visited_at FROM analytics_visits 
            ORDER BY visited_at DESC 
            LIMIT 1`
         ).first();
 
-        // Calculate last visitor time
         let lastVisitorTime = '--';
         if (lastVisit?.visited_at) {
           const lastVisitDate = new Date(lastVisit.visited_at);
@@ -268,7 +274,7 @@ export async function onRequest(context) {
           {
             headers: {
               'Content-Type': 'application/json',
-              'Cache-Control': 'public, max-age=60',
+              'Cache-Control': 'public, max-age=300',
               'Content-Security-Policy':
                 "default-src 'self'; script-src 'self'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline';",
               ...corsHeaders,
@@ -301,10 +307,12 @@ export async function onRequest(context) {
       headers: corsHeaders,
     });
   } catch (error) {
+    console.error('Analytics error:', error);
     return new Response(
       JSON.stringify({
         success: false,
         error: 'Internal server error',
+        details: error.message,
       }),
       {
         status: 500,

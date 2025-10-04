@@ -15,7 +15,7 @@ interface StickiesProps {
   isMobile: boolean;
 }
 
-const CACHE_DURATION = 15 * 60 * 1000;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes cache
 const CACHE_KEY = 'analytics_cache';
 
 const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
@@ -23,8 +23,8 @@ const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
     todaysViews: 0,
     totalViews: 0,
     totalCountries: 0,
-    topCountry: '',
-    lastVisitor: '',
+    topCountry: '--',
+    lastVisitor: '--',
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -42,7 +42,6 @@ const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
             return;
           }
         } catch {
-          // Invalid cache, continue to fetch
           console.log('Analytics: Cache invalid, fetching fresh data');
         }
       }
@@ -101,6 +100,7 @@ const Stickies = ({ sticky, onMouseDown, isMobile }: StickiesProps) => {
   useEffect(() => {
     fetchMetrics();
 
+    // Auto-refresh every 5 minutes (same as cache duration)
     const interval = setInterval(fetchMetrics, CACHE_DURATION);
     return () => clearInterval(interval);
   }, []);
