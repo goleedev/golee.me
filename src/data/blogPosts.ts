@@ -2,6 +2,15 @@ import type { BlogPost } from '../types';
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: 'one-year-at-cloudflare',
+    title: 'One Year at Cloudflare - Reflections on Growth',
+    date: '2025-12-04',
+    description:
+      'Looking back at my first year at Cloudflare and what I learned about engineering, collaboration, and growth.',
+    thumbnailUrl: '/thumbnails/one-year-at-cloudflare.png',
+    readTime: '8 min read',
+  },
+  {
     slug: 'github-clone-tracker',
     title: 'Tracking GitHub Clone Stats Beyond the 14-Day Limit',
     date: '2025-10-11',
