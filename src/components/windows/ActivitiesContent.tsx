@@ -35,6 +35,16 @@ interface Activity {
 export const ActivitiesContent = () => {
   const activities: Activity[] = [
     {
+      id: 'aws-women-in-cloud-2026',
+      title: 'From Korea to a Global Tech Company: One Year Later',
+      description:
+        'A retrospective talk on my global job search journey, highlighting key strategies that paid off, lessons learned after a year in a global tech company, and actionable advice for engineers aiming to work abroad.',
+      date: 'January 2026',
+      category: 'speaking',
+      organization: 'AWSKRUG Women In Cloud',
+      image: '/activities/aws-women-in-cloud-2026.png',
+    },
+    {
       id: 'lead-developer-book-2025',
       title: 'Lead Developer Career Guide Book Recommendation',
       description:
@@ -205,11 +215,7 @@ export const ActivitiesContent = () => {
         <div className="space-y-6 sm:space-y-8">
           {Object.entries(groupedActivities).map(
             ([category, categoryActivities]) => (
-              <ContentSection
-                key={category}
-                title={getCategoryLabel(category as Activity['category'])}
-                className="mb-6"
-              >
+              <ContentSection key={category} className="mb-6">
                 <div className="flex items-center space-x-2 mb-4">
                   {getCategoryIcon(category as Activity['category'])}
                   <h3 className="font-medium text-gray-900">
