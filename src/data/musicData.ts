@@ -1,10 +1,10 @@
 import type { Track } from '../types';
 
 export const defaultTrack: Track = {
-  id: 'rA6DIHIg5To',
-  title: 'Gone Girl',
-  artist: 'SZA',
-  duration: '3:59',
-  thumbnail: 'https://img.youtube.com/vi/rA6DIHIg5To/maxresdefault.jpg',
-  url: 'https://www.youtube.com/watch?v=rA6DIHIg5To',
+  id: 'V6TEcoNUmc8',
+  title: 'Ditto',
+  artist: 'NewJeans',
+  duration: '3:06',
+  thumbnail: 'https://img.youtube.com/vi/V6TEcoNUmc8/maxresdefault.jpg',
+  url: 'https://www.youtube.com/watch?v=V6TEcoNUmc8',
 };
