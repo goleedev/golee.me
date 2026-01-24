@@ -1,4 +1,4 @@
-const ANALYTICS_COOLDOWN = 3 * 60 * 1000; // 3분
+const ANALYTICS_COOLDOWN = 24 * 60 * 60 * 1000; // 24시간
 const STORAGE_KEY = 'analytics_last_tracked';
 const CACHE_KEY = 'analytics_cache'; // 추가
 
