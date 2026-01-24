@@ -30,7 +30,29 @@ export const getMentorshipData = async (): Promise<MentorshipEntry[]> => {
 };
 
 const parseCSV = (csvText: string): MentorshipEntry[] => {
-  const lines = csvText.split('\n').filter((line) => line.trim());
+  const lines: string[] = [];
+  let currentLine = '';
+  let inQuotes = false;
+
+  for (let i = 0; i < csvText.length; i++) {
+    const char = csvText[i];
+
+    if (char === '"') {
+      inQuotes = !inQuotes;
+      currentLine += char;
+    } else if (char === '\n' && !inQuotes) {
+      if (currentLine.trim()) {
+        lines.push(currentLine);
+      }
+      currentLine = '';
+    } else {
+      currentLine += char;
+    }
+  }
+
+  if (currentLine.trim()) {
+    lines.push(currentLine);
+  }
 
   if (lines.length <= 1) {
     return [];
