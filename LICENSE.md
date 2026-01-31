@@ -48,4 +48,4 @@ If you use or fork this codebase, you **must**:
 2. Include a link to the original repository: [https://github.com/goleedev/golee.me](https://github.com/goleedev/golee.me)
 3. Replace all personal content with your own before publishing or deployment.
 
-📩 For permissions or inquiries: **golee.dev@gmail.com**
+📩 For permissions or inquiries: **hey@golee.me**

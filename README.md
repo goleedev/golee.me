@@ -137,7 +137,7 @@ See the LICENSE file for full details.
 
 For questions about using this codebase or licensing inquiries:
 
-- Email: golee.dev@gmail.com
+- Email: hey@golee.me
 - Open an issue on GitHub
 
 💬 If this project inspired you or helped you build your own,  

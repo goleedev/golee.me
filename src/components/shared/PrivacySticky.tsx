@@ -62,7 +62,7 @@ export const PrivacySticky: React.FC<{
     • Last updated date indicated above
 
 11. Contact
-    • Email: golee.dev@gmail.com
+    • Email: hey@golee.me
     • Response within 7 business days
 
 12. Legal Compliance

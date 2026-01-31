@@ -341,7 +341,7 @@ export const ActivitiesContent = () => {
             other collaboration opportunities.
           </p>
           <ExternalLink
-            href="mailto:golee.dev@gmail.com"
+            href="mailto:hey@golee.me"
             icon={<Mail size={16} className="text-gray-600" />}
             label="Get in Touch"
           />

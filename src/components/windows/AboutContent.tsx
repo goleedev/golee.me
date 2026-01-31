@@ -139,7 +139,7 @@ export const AboutContent = () => {
             </div>
             <div className="flex items-center space-x-1">
               <Mail size={12} />
-              <span>golee.dev@gmail.com</span>
+              <span>hey@golee.me</span>
             </div>
           </div>
         </div>
@@ -250,7 +250,7 @@ export const AboutContent = () => {
               label="LinkedIn"
             />
             <ExternalLink
-              href="mailto:golee.dev@gmail.com"
+              href="mailto:hey@golee.me"
               icon={<Mail size={16} className="text-gray-600" />}
               label="Email"
             />
