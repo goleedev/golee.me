@@ -70,12 +70,12 @@ export const markdownComponents = (postSlug: string): Components => ({
     return <CodeBlockWithCopy>{children}</CodeBlockWithCopy>;
   },
   ul: ({ children }) => (
-    <ul className="list-disc list-inside mb-4 space-y-2">{children}</ul>
+    <ul className="list-disc pl-6 mb-4 space-y-2 marker:text-gray-500">{children}</ul>
   ),
   ol: ({ children }) => (
-    <ol className="list-decimal list-inside mb-4 space-y-2">{children}</ol>
+    <ol className="list-decimal pl-6 mb-4 space-y-2 marker:text-gray-500">{children}</ol>
   ),
-  li: ({ children }) => <li className="text-gray-700 ml-4">{children}</li>,
+  li: ({ children }) => <li className="text-gray-700 leading-relaxed">{children}</li>,
   hr: () => <hr className="my-8 border-gray-300" />,
   strong: ({ children }) => (
     <strong className="font-semibold">{children}</strong>

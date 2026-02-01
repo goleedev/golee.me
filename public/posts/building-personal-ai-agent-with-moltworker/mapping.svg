@@ -1,0 +1,39 @@
+<svg width="900" height="300" viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    text { font-family: Inter, sans-serif; fill: #111; }
+    .box { fill: #fff; stroke: #111; stroke-width: 1.1; rx: 8; }
+    .title { font-weight: 600; }
+    .muted { fill: #555; font-size: 13px; }
+    .ok { fill: #16a34a; }
+    .no { fill: #dc2626; }
+  </style>
+
+  <text x="450" y="30" text-anchor="middle" font-size="16" font-weight="600">
+    Mapping This Project to Moltworker
+  </text>
+
+  <!-- Rows -->
+  <g transform="translate(80,60)">
+    <rect width="740" height="40" class="box"/>
+    <text x="20" y="26" class="title">Workers (Orchestration)</text>
+    <text x="680" y="26" class="ok">✔</text>
+  </g>
+
+  <g transform="translate(80,110)">
+    <rect width="740" height="40" class="box"/>
+    <text x="20" y="26" class="title">Sandbox SDK (Isolated Execution)</text>
+    <text x="680" y="26" class="ok">✔</text>
+  </g>
+
+  <g transform="translate(80,160)">
+    <rect width="740" height="40" class="box"/>
+    <text x="20" y="26" class="title">R2 (Persistence)</text>
+    <text x="680" y="26" class="ok">✔</text>
+  </g>
+
+  <g transform="translate(80,210)">
+    <rect width="740" height="40" class="box"/>
+    <text x="20" y="26" class="title">Browser Rendering / CDP</text>
+    <text x="680" y="26" class="no">✕</text>
+  </g>
+</svg>

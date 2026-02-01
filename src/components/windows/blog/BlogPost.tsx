@@ -54,7 +54,7 @@ export const BlogPost: React.FC<BlogPostProps> = ({
               <img
                 src={post.thumbnailUrl}
                 alt={post.title}
-                className="w-full max-w-full h-48 sm:h-64 object-cover rounded-lg mb-6"
+                className="w-full max-w-full h-48 sm:h-full sm:max-h-96 object-cover rounded-lg mb-6"
               />
             )}
           </div>

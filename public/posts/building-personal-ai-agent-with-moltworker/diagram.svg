@@ -1,0 +1,171 @@
+<svg width="1200" height="640" viewBox="0 0 1200 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font: 600 20px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; fill:#0f172a; }
+      .subtitle { font: 400 13px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; fill:#334155; }
+      .label { font: 600 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; fill:#0f172a; }
+      .small { font: 500 12px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; fill:#334155; }
+      .tiny { font: 500 11px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; fill:#475569; }
+      .box { fill:#ffffff; stroke:#e2e8f0; stroke-width:2; rx:16; }
+      .box2 { fill:#f8fafc; stroke:#e2e8f0; stroke-width:2; rx:16; }
+      .chip { fill:#f1f5f9; stroke:#e2e8f0; stroke-width:1.5; rx:10; }
+      .arrow { stroke:#64748b; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; marker-end:url(#mArrow); }
+      .dash { stroke:#94a3b8; stroke-width:2; stroke-dasharray:6 6; stroke-linecap:round; }
+      .accent { fill:#0ea5e9; }
+      .accent2 { fill:#22c55e; }
+      .accent3 { fill:#f97316; }
+      .accent4 { fill:#a855f7; }
+      .bg { fill:#ffffff; }
+    </style>
+
+    <linearGradient id="g1" x1="0" y1="0" x2="1200" y2="640" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#f8fafc"/>
+    </linearGradient>
+
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#0f172a" flood-opacity="0.08"/>
+    </filter>
+
+    <marker id="mArrow" markerWidth="14" markerHeight="14" refX="12" refY="7" orient="auto">
+      <path d="M2 2 L12 7 L2 12" fill="none" stroke="#64748b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect x="0" y="0" width="1200" height="640" fill="url(#g1)"/>
+
+  <!-- Header -->
+  <text x="48" y="54" class="title">Personal AI Agent PoC (Moltworker-inspired)</text>
+  <text x="48" y="78" class="subtitle">GitHub blog corpus → R2 index → search → prompt → AI Gateway → structured ideas → local UI</text>
+
+  <!-- Main flow group -->
+  <g filter="url(#shadow)">
+    <!-- Box: Source -->
+    <rect x="48" y="130" width="260" height="120" class="box"/>
+    <text x="72" y="164" class="label">Blog posts (GitHub)</text>
+    <text x="72" y="190" class="small">MD/MDX + frontmatter</text>
+    <g>
+      <rect x="72" y="208" width="98" height="26" class="chip"/>
+      <circle cx="85" cy="221" r="6" class="accent"/>
+      <text x="97" y="226" class="tiny">public repo</text>
+
+      <rect x="176" y="208" width="108" height="26" class="chip"/>
+      <circle cx="189" cy="221" r="6" class="accent2"/>
+      <text x="201" y="226" class="tiny">incremental</text>
+    </g>
+
+    <!-- Box: Ingest/Parse -->
+    <rect x="340" y="130" width="260" height="120" class="box"/>
+    <text x="364" y="164" class="label">Ingest + Parse</text>
+    <text x="364" y="190" class="small">Fetch, frontmatter parse, normalize JSON</text>
+    <text x="364" y="212" class="tiny">state.json (sha diff) for incremental runs</text>
+
+    <!-- Box: R2 -->
+    <rect x="632" y="130" width="260" height="120" class="box"/>
+    <text x="656" y="164" class="label">R2 (persistence)</text>
+    <text x="656" y="190" class="small">posts/*.json, state.json</text>
+    <text x="656" y="212" class="tiny">index.json built from stored objects</text>
+    <g>
+      <rect x="656" y="226" width="120" height="26" class="chip"/>
+      <circle cx="669" cy="239" r="6" class="accent3"/>
+      <text x="681" y="244" class="tiny">index.json</text>
+    </g>
+
+    <!-- Box: Search -->
+    <rect x="924" y="130" width="228" height="120" class="box"/>
+    <text x="948" y="164" class="label">Search</text>
+    <text x="948" y="190" class="small">keyword + relevance</text>
+    <text x="948" y="212" class="tiny">conservative matching</text>
+  </g>
+
+  <!-- Arrows top row -->
+  <path class="arrow" d="M308 190 C320 190 324 190 340 190"/>
+  <path class="arrow" d="M600 190 C614 190 618 190 632 190"/>
+  <path class="arrow" d="M892 190 C906 190 910 190 924 190"/>
+
+  <!-- Middle section: Prompt + LLM -->
+  <g filter="url(#shadow)">
+    <!-- Worker Orchestrator -->
+    <rect x="48" y="292" width="552" height="160" class="box2"/>
+    <text x="72" y="326" class="label">Cloudflare Worker (orchestration)</text>
+    <text x="72" y="352" class="small">Build prompts, call model, enforce strict JSON</text>
+
+    <rect x="72" y="372" width="240" height="52" class="chip"/>
+    <text x="88" y="402" class="small">Prompt construction</text>
+    <text x="88" y="420" class="tiny">topic + top matches + rules</text>
+
+    <rect x="332" y="372" width="240" height="52" class="chip"/>
+    <text x="348" y="402" class="small">JSON-only output</text>
+    <text x="348" y="420" class="tiny">schema + parsing + fallback</text>
+
+    <!-- AI Gateway -->
+    <rect x="632" y="292" width="260" height="160" class="box2"/>
+    <text x="656" y="326" class="label">AI Gateway</text>
+    <text x="656" y="352" class="small">model routing + observability</text>
+
+    <rect x="656" y="372" width="212" height="26" class="chip"/>
+    <circle cx="669" cy="385" r="6" class="accent4"/>
+    <text x="681" y="390" class="tiny">BYOK / unified billing</text>
+
+    <rect x="656" y="406" width="212" height="26" class="chip"/>
+    <circle cx="669" cy="419" r="6" class="accent"/>
+    <text x="681" y="424" class="tiny">logs / metrics / retries</text>
+
+    <!-- Ideas JSON -->
+    <rect x="924" y="292" width="228" height="160" class="box2"/>
+    <text x="948" y="326" class="label">Ideas (JSON)</text>
+    <text x="948" y="352" class="small">title / hook / outline</text>
+    <text x="948" y="372" class="tiny">connects_to + confidence</text>
+
+    <rect x="948" y="394" width="180" height="40" class="chip"/>
+    <text x="964" y="418" class="small">blog_en[]</text>
+  </g>
+
+  <!-- Arrows middle -->
+  <path class="arrow" d="M1038 250 C1038 264 1038 272 1038 292"/>
+  <path class="arrow" d="M590 372 C610 372 616 372 632 372"/>
+  <path class="arrow" d="M892 372 C906 372 910 372 924 372"/>
+
+  <!-- Bottom: Local UI + Cron + Access -->
+  <g filter="url(#shadow)">
+    <!-- Local UI -->
+    <rect x="48" y="494" width="552" height="114" class="box"/>
+    <text x="72" y="528" class="label">Local UI (React)</text>
+    <text x="72" y="552" class="small">Topic input → generate → copy markdown</text>
+    <text x="72" y="574" class="tiny">local proxy / internal token during dev</text>
+
+    <rect x="332" y="528" width="240" height="54" class="chip"/>
+    <text x="348" y="556" class="small">BlogIdeas.app</text>
+    <text x="348" y="574" class="tiny">radio buttons + copy buttons</text>
+
+    <!-- Cron -->
+    <rect x="632" y="494" width="260" height="114" class="box"/>
+    <text x="656" y="528" class="label">Cron (scheduled)</text>
+    <text x="656" y="552" class="small">ingest + build index</text>
+    <text x="656" y="574" class="tiny">incremental updates</text>
+
+    <!-- Access -->
+    <rect x="924" y="494" width="228" height="114" class="box"/>
+    <text x="948" y="528" class="label">Zero Trust Access</text>
+    <text x="948" y="552" class="small">protect admin / api</text>
+    <text x="948" y="574" class="tiny">avoid reinventing auth</text>
+  </g>
+
+  <!-- Arrows bottom -->
+  <path class="arrow" d="M1038 452 C1038 468 1038 476 1038 494"/>
+  <path class="arrow" d="M324 452 C260 470 216 482 200 494"/>
+  <path class="arrow" d="M470 452 C520 470 570 482 632 520"/>
+
+  <!-- Dotted boundaries -->
+  <path class="dash" d="M40 110 H1160"/>
+  <text x="48" y="114" class="tiny">Data + orchestration</text>
+
+  <path class="dash" d="M40 474 H1160"/>
+  <text x="48" y="478" class="tiny">Interfaces + automation</text>
+
+  <!-- Footer note -->
+  <text x="48" y="622" class="tiny">
+    Notes: This diagram is Moltworker-inspired. It mirrors the primitives (Workers + Sandbox + R2 + AI Gateway + Access) while using a custom ingestion/search/generation pipeline.
+  </text>
+</svg>
