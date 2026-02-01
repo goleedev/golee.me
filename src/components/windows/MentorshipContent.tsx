@@ -46,14 +46,14 @@ export const MentorshipContent: React.FC = () => {
         /(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/,
         (year, month, day) => {
           return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-        }
+        },
       );
 
       const date = new Date(dateStr);
 
       if (isNaN(date.getTime())) {
         const dateMatch = timestamp.match(
-          /(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/
+          /(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/,
         );
         if (dateMatch) {
           return `${dateMatch[2]}/${dateMatch[3]}/${dateMatch[1]}`;
@@ -157,10 +157,10 @@ export const MentorshipContent: React.FC = () => {
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex-1">
                       <div className="flex items-center space-x-2 mb-1">
-                        <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs font-light">
+                        <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs font-light whitespace-nowrap flex-shrink-0 max-w-40 md:max-w-none truncate">
                           {entry.topic}
                         </span>
-                        <span className="text-xs text-gray-500">
+                        <span className="text-xs h-full text-gray-500 whitespace-nowrap flex-shrink-0">
                           {formatDate(entry.timestamp)}
                         </span>
                       </div>
