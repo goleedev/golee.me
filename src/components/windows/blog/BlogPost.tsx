@@ -37,15 +37,15 @@ export const BlogPost: React.FC<BlogPostProps> = ({
               {post.title}
             </h1>
 
-            <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-6">
-              <div className="flex items-center space-x-2">
-                <Calendar size={16} />
-                <span>{formatDate(post.date)}</span>
+            <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600 mb-6">
+              <div className="flex items-center gap-2 min-w-0">
+                <Calendar size={16} className="flex-shrink-0" />
+                <span className="truncate">{formatDate(post.date)}</span>
               </div>
               {post.readTime && (
-                <div className="flex items-center space-x-2">
-                  <Clock size={16} />
-                  <span>{post.readTime}</span>
+                <div className="flex items-center gap-2 min-w-0">
+                  <Clock size={16} className="flex-shrink-0" />
+                  <span className="truncate">{post.readTime}</span>
                 </div>
               )}
             </div>
