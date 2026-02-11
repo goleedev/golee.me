@@ -1,10 +1,10 @@
 import type { Track } from '../types';
 
 export const defaultTrack: Track = {
-  id: 'V6TEcoNUmc8',
-  title: 'Ditto',
+  id: 'VOmIplFAGeg',
+  title: 'Cookie',
   artist: 'NewJeans',
-  duration: '3:06',
-  thumbnail: 'https://img.youtube.com/vi/V6TEcoNUmc8/maxresdefault.jpg',
-  url: 'https://www.youtube.com/watch?v=V6TEcoNUmc8',
+  duration: '3:58',
+  thumbnail: 'https://img.youtube.com/vi/VOmIplFAGeg/maxresdefault.jpg',
+  url: 'https://www.youtube.com/watch?v=VOmIplFAGeg',
 };
