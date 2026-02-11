@@ -1,21 +1,6 @@
-const ANALYTICS_COOLDOWN = 24 * 60 * 60 * 1000; // 24시간
-const STORAGE_KEY = 'analytics_last_tracked';
-const CACHE_KEY = 'analytics_cache'; // 추가
+const CACHE_KEY = 'analytics_cache';
 
 export const trackVisit = (): void => {
-  const lastTracked = localStorage.getItem(STORAGE_KEY);
-  const now = Date.now();
-
-  if (lastTracked && now - parseInt(lastTracked) < ANALYTICS_COOLDOWN) {
-    if (import.meta.env.DEV) {
-      const remaining = Math.ceil(
-        (ANALYTICS_COOLDOWN - (now - parseInt(lastTracked))) / 1000
-      );
-      console.log(`[Analytics] Cooldown: ${remaining}s remaining`);
-    }
-    return;
-  }
-
   const referrer = document.referrer || 'Direct';
 
   fetch('/api/analytics', {
@@ -26,14 +11,14 @@ export const trackVisit = (): void => {
     .then((response) => response.json())
     .then((data) => {
       if (data.success && data.message === 'Visit tracked') {
-        localStorage.setItem(STORAGE_KEY, now.toString());
-
         // 🎯 캐시 무효화 - Analytics Sticky가 즉시 새 데이터 가져옴
         localStorage.removeItem(CACHE_KEY);
 
         if (import.meta.env.DEV) {
           console.log('[Analytics] ✅ Visit tracked, cache invalidated');
         }
+      } else if (data.success && data.message === 'Duplicate visit skipped') {
+        // 🎯 중복 방문 - 캐시 유지, Analytics Sticky는 기존 데이터 계속 사용
       }
     })
     .catch((err) => {
