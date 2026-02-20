@@ -1,7 +1,7 @@
 # BagelOS Portfolio
 
 ![Total Clones](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/goleedev/33e50811ac0dfb7f9b4c6ba6abaa79a6/raw/clone-stats.json?v=2)
-![GitHub stars](https://img.shields.io/github/stars/goleedev/golee.me?style=flat-square&color=blue)
+![GitHub stars](https://img.shields.io/github/stars/goleedev/golee.me?style=flat-square)
 
 ![Total Views](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/goleedev/33e50811ac0dfb7f9b4c6ba6abaa79a6/raw/view-stats.json)
 
