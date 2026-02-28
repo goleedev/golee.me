@@ -1,4 +1,3 @@
-import React from 'react';
 import { Calendar, Clock } from 'lucide-react';
 import type { BlogPost } from '../../../types';
 import { formatDate } from '../../../utils/dateFormatter';
@@ -9,11 +8,7 @@ interface BlogListProps {
   onPostClick: (post: BlogPost) => void;
 }
 
-export const BlogList: React.FC<BlogListProps> = ({
-  posts,
-  isLoading,
-  onPostClick,
-}) => {
+export const BlogList = ({ posts, isLoading, onPostClick }: BlogListProps) => {
   return (
     <div className="px-4 sm:px-6 pt-4 sm:pt-6 h-full overflow-auto bg-white/95 backdrop-blur-xl">
       <div className="w-full mx-auto min-w-0">

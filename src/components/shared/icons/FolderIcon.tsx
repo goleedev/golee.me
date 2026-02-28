@@ -1,10 +1,8 @@
-import React from 'react';
-
 type FolderIconProps = {
   size?: number;
 };
 
-const FolderIcon: React.FC<FolderIconProps> = ({ size = 36 }) => {
+const FolderIcon = ({ size = 36 }: FolderIconProps) => {
   return (
     <div className="flex flex-col items-center justify-center drop-shadow-md">
       <svg

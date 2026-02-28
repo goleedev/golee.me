@@ -13,13 +13,13 @@ interface ExperienceItemProps {
   description: string;
 }
 
-const ExperienceItem: React.FC<ExperienceItemProps> = ({
+const ExperienceItem = ({
   role,
   company,
   location,
   period,
   description,
-}) => {
+}: ExperienceItemProps) => {
   return (
     <div className="border-l-2 border-gray-400 pl-4">
       <div className="flex items-center justify-between sm:justify-normal space-x-2 mb-1">

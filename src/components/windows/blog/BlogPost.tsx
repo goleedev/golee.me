@@ -1,11 +1,10 @@
-import React from 'react';
-import { Calendar, Clock, ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Calendar, Clock } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
 import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
 import type { BlogPost as BlogPostType } from '../../../types';
-import { markdownComponents } from '../../../utils/markdownComponents';
 import { formatDate } from '../../../utils/dateFormatter';
+import { markdownComponents } from '../../../utils/markdownComponents';
 
 interface BlogPostProps {
   post: BlogPostType;
@@ -14,12 +13,12 @@ interface BlogPostProps {
   onBack: () => void;
 }
 
-export const BlogPost: React.FC<BlogPostProps> = ({
+export const BlogPost = ({
   post,
   content,
   isLoading,
   onBack,
-}) => {
+}: BlogPostProps) => {
   return (
     <div className="px-4 sm:px-6 pt-4 sm:pt-6 h-full overflow-y-scroll bg-white/95 backdrop-blur-xl">
       <div className="w-full mx-auto min-w-0">

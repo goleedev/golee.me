@@ -1,5 +1,3 @@
-import React from 'react';
-
 interface StatCardProps {
   metric: string | number;
   label: string;
@@ -7,12 +5,12 @@ interface StatCardProps {
   isLoading?: boolean;
 }
 
-export const StatCard: React.FC<StatCardProps> = ({
+export const StatCard = ({
   metric,
   label,
   className = '',
   isLoading = false,
-}) => {
+}: StatCardProps) => {
   if (isLoading) {
     return (
       <div

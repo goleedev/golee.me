@@ -1,9 +1,14 @@
 import type { MetricsData } from './Stickies';
 
-export const AnalyticsSticky: React.FC<{
+interface AnalyticsStickyProps {
   metrics: MetricsData;
   isLoading: boolean;
-}> = ({ metrics, isLoading }) => (
+}
+
+export const AnalyticsSticky = ({
+  metrics,
+  isLoading,
+}: AnalyticsStickyProps) => (
   <>
     <div className="flex items-center justify-between mb-2">
       <span className="font-semibold">🔍 Analytics</span>

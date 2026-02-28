@@ -6,11 +6,7 @@ interface PageHeaderProps {
   icon?: React.ReactNode;
 }
 
-export const PageHeader: React.FC<PageHeaderProps> = ({
-  title,
-  subtitle,
-  icon,
-}) => {
+export const PageHeader = ({ title, subtitle, icon }: PageHeaderProps) => {
   return (
     <div className="text-center mb-6 sm:mb-8">
       {icon && <div className="mb-4">{icon}</div>}

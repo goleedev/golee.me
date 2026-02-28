@@ -21,12 +21,12 @@ interface StickiesProps {
 const CACHE_DURATION = 1 * 60 * 1000; // 1분
 const CACHE_KEY = 'analytics_cache';
 
-const Stickies: React.FC<StickiesProps> = ({
+const Stickies = ({
   sticky,
   onMouseDown,
   onToggleExpand,
   isMobile,
-}) => {
+}: StickiesProps) => {
   const [metrics, setMetrics] = useState<MetricsData>({
     todaysViews: 0,
     totalViews: 0,
@@ -77,7 +77,7 @@ const Stickies: React.FC<StickiesProps> = ({
           JSON.stringify({
             data: result.data,
             timestamp: Date.now(),
-          })
+          }),
         );
       }
     } catch (error) {
@@ -131,8 +131,8 @@ const Stickies: React.FC<StickiesProps> = ({
         sticky.type === 'privacy' && !isMobile
           ? '168px'
           : sticky.type === 'privacy' && isMobile
-          ? '182px'
-          : '208px',
+            ? '182px'
+            : '208px',
     };
   };
 

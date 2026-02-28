@@ -1,12 +1,12 @@
 import { AlertCircle, Github, Linkedin } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   getMentorshipData,
   type MentorshipEntry,
 } from '../../services/mentorshipService';
 import { StatCard } from '../shared/StatCard';
 
-export const MentorshipContent: React.FC = () => {
+export const MentorshipContent = () => {
   const [entries, setEntries] = useState<MentorshipEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

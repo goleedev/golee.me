@@ -1,7 +1,10 @@
-import React from 'react';
 import { Music } from 'lucide-react';
 
-const MusicIcon: React.FC<{ size?: number }> = ({ size = 34 }) => {
+interface MusicIconProps {
+  size?: number;
+}
+
+const MusicIcon = ({ size = 34 }: MusicIconProps) => {
   return (
     <div
       className="flex items-center justify-center rounded-lg shadow-md"

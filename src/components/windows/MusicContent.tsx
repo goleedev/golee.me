@@ -50,7 +50,7 @@ declare global {
             onReady: (event: YouTubePlayerEvent) => void;
             onStateChange: (event: YouTubePlayerEvent) => void;
           };
-        }
+        },
       ) => YouTubePlayer;
       PlayerState: {
         PLAYING: number;
@@ -76,12 +76,12 @@ const YouTubePlayerState = {
 
 type PlayIconType = 'play' | 'pause' | 'loading';
 
-export const MusicContent: React.FC<MusicContentProps> = ({
+export const MusicContent = ({
   currentTrack,
   isLoadingTrack,
   isPlaying,
   setIsPlaying,
-}) => {
+}: MusicContentProps) => {
   const playerRef = useRef<YouTubePlayer | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<number | null>(null);
@@ -150,7 +150,7 @@ export const MusicContent: React.FC<MusicContentProps> = ({
     }
 
     const existingScript = document.querySelector(
-      'script[src="https://www.youtube.com/iframe_api"]'
+      'script[src="https://www.youtube.com/iframe_api"]',
     );
     if (existingScript) {
       const checkApi = () => {
@@ -423,7 +423,7 @@ export const MusicContent: React.FC<MusicContentProps> = ({
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
     },
-    [duration, playerReady]
+    [duration, playerReady],
   );
 
   const formatTime = (seconds: number): string => {
@@ -622,8 +622,8 @@ export const MusicContent: React.FC<MusicContentProps> = ({
                 iconType === 'loading'
                   ? 'Loading...'
                   : iconType === 'pause'
-                  ? 'Pause'
-                  : 'Play'
+                    ? 'Pause'
+                    : 'Play'
               }
             >
               {renderPlayPauseIcon()}

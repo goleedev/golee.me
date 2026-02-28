@@ -1,9 +1,14 @@
 import { Maximize2, Minimize2 } from 'lucide-react';
 
-export const PrivacySticky: React.FC<{
+interface PrivacyStickyProps {
   isExpanded: boolean;
   onToggleExpand: () => void;
-}> = ({ isExpanded, onToggleExpand }) => {
+}
+
+export const PrivacySticky = ({
+  isExpanded,
+  onToggleExpand,
+}: PrivacyStickyProps) => {
   const fullText = `Last Updated: October 4, 2025
 
 1. Data Collection

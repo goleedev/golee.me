@@ -13,7 +13,7 @@ interface TimelineItemProps {
   children?: React.ReactNode;
 }
 
-export const TimelineItem: React.FC<TimelineItemProps> = ({
+export const TimelineItem = ({
   title,
   subtitle,
   date,
@@ -24,7 +24,7 @@ export const TimelineItem: React.FC<TimelineItemProps> = ({
   isFeatured = false,
   isCurrent = false,
   children,
-}) => {
+}: TimelineItemProps) => {
   return (
     <div className="relative">
       {/* Timeline dot */}

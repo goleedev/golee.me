@@ -1,5 +1,5 @@
-import React from 'react';
 import { ExternalLink as ExternalLinkIcon } from 'lucide-react';
+import React from 'react';
 
 interface ExternalLinkProps {
   href: string;
@@ -8,12 +8,12 @@ interface ExternalLinkProps {
   className?: string;
 }
 
-export const ExternalLink: React.FC<ExternalLinkProps> = ({
+export const ExternalLink = ({
   href,
   icon,
   label,
   className = '',
-}) => {
+}: ExternalLinkProps) => {
   return (
     <a
       href={href}

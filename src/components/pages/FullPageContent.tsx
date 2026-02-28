@@ -1,12 +1,11 @@
-import React from 'react';
-import { AboutContent } from '../windows/AboutContent';
-import { WorkContent } from '../windows/WorkContent';
-import { CommunityContent } from '../windows/CommunityContent';
-import { ActivitiesContent } from '../windows/ActivitiesContent';
-import { MusicContent } from '../windows/MusicContent';
-import { MentorshipContent } from '../windows/MentorshipContent';
-import { GuestbookContent } from '../windows/GuestbookContent';
 import { useMusic } from '../../hooks/useMusic';
+import { AboutContent } from '../windows/AboutContent';
+import { ActivitiesContent } from '../windows/ActivitiesContent';
+import { CommunityContent } from '../windows/CommunityContent';
+import { GuestbookContent } from '../windows/GuestbookContent';
+import { MentorshipContent } from '../windows/MentorshipContent';
+import { MusicContent } from '../windows/MusicContent';
+import { WorkContent } from '../windows/WorkContent';
 
 interface FullPageContentProps {
   pageId: string;
@@ -46,7 +45,7 @@ const MusicContentWithProps = () => {
   );
 };
 
-export const FullPageContent: React.FC<FullPageContentProps> = ({ pageId }) => {
+export const FullPageContent = ({ pageId }: FullPageContentProps) => {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="container mx-auto px-4 py-8">

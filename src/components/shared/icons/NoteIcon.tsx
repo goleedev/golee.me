@@ -1,6 +1,4 @@
-import React from 'react';
-
-const NoteIcon: React.FC = () => {
+const NoteIcon = () => {
   return (
     <div className="relative w-[34px] h-[34px] rounded-lg shadow-md overflow-hidden">
       <div className="absolute top-0 left-0 w-full h-2.5 bg-gradient-to-b from-yellow-200 to-yellow-400" />

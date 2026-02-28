@@ -16,18 +16,18 @@ interface DesktopProps {
   onIconMouseDown: (
     e: React.MouseEvent,
     iconId: string,
-    position: Position
+    position: Position,
   ) => void;
   onIconClick: (
     e: React.MouseEvent,
     iconId: string,
     hasDragged: boolean,
-    onDockItemClick: (id: string) => void
+    onDockItemClick: (id: string) => void,
   ) => void;
   onDockItemClick: (itemId: string) => void;
 }
 
-const Desktop: React.FC<DesktopProps> = ({
+const Desktop = ({
   dockItems,
   desktopIconPositions,
   selectedIcon,
@@ -38,7 +38,7 @@ const Desktop: React.FC<DesktopProps> = ({
   onIconMouseDown,
   onIconClick,
   onDockItemClick,
-}) => {
+}: DesktopProps) => {
   return (
     <div className="absolute inset-0">
       <div
