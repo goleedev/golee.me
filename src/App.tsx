@@ -11,6 +11,7 @@ import Dock from './components/dock/Dock';
 import MenuBar from './components/layout/MenuBar';
 import Window from './components/layout/Window';
 import Stickies from './components/shared/Stickies';
+import { SpotlightSearch } from './components/spotlight/SpotlightSearch';
 import { initialDockItems } from './data/dockItems';
 import { useDesktopIcons } from './hooks/useDesktopIcons';
 import { useDrag } from './hooks/useDrag';
@@ -33,6 +34,7 @@ const BagelOSPortfolio = () => {
   const [dockItems, setDockItems] = useState<DockItem[]>([]);
   const [currentTime, setCurrentTime] = useState(new Date());
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [isSpotlightOpen, setIsSpotlightOpen] = useState(false);
 
   const currentPageId = location.pathname.substring(1);
 
@@ -127,6 +129,18 @@ const BagelOSPortfolio = () => {
     }
   }, [currentTrack, isLoadingTrack, isPlaying, currentPageId]);
 
+  // Cmd+K / Ctrl+K to toggle spotlight
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setIsSpotlightOpen((prev) => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   // Track page visit on mount
   useEffect(() => {
     trackVisit();
@@ -206,7 +220,11 @@ const BagelOSPortfolio = () => {
 
   return (
     <div className="h-screen w-full relative overflow-hidden bg-gray-100">
-      <MenuBar currentTime={currentTime} onLogoClick={handleLogoClick} />
+      <MenuBar
+        currentTime={currentTime}
+        onLogoClick={handleLogoClick}
+        onAskClick={() => setIsSpotlightOpen(true)}
+      />
 
       {/* Sticky Notes */}
       {stickies.map((sticky) => (
@@ -262,6 +280,11 @@ const BagelOSPortfolio = () => {
         onDockItemClick={dockItemClick}
         isMobile={isMobile}
       />
+
+      {/* Spotlight — Ask me anything */}
+      {isSpotlightOpen && (
+        <SpotlightSearch onClose={() => setIsSpotlightOpen(false)} />
+      )}
     </div>
   );
 };

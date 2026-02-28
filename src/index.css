@@ -2,6 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes spotlight-in {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+}
+
+.spotlight-panel {
+  animation: spotlight-in 0.2s ease-out forwards;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
