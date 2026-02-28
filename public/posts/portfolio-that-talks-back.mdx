@@ -1,0 +1,208 @@
+---
+title: A Portfolio That Talks Back — Powered by Cloudflare Workers AI
+date: 2026-02-28
+description: How I turned my portfolio into an AI assistant using Cloudflare Workers AI, Llama 3.3 70B, and a deliberately simple architecture.
+thumbnailUrl: /thumbnails/portfolio-that-talks-back.gif
+---
+
+> "What if my portfolio could answer questions about me — even when I'm not there?"
+
+---
+
+## Why I Built This
+
+I speak at events. I run a Women in Tech community. I do mentoring sessions. And at almost every one of them, someone asks the same kinds of questions:
+
+_"What stack do you use?"_  
+_"Where do you work now?"_  
+_"What was that blog post you mentioned?"_
+
+I don't mind answering. But I started wondering —
+
+> What if someone lands on my portfolio at 2am — curious, but with no way to ask me directly?
+>
+> What if a first-time visitor wants a quick feel for who I am before reaching out?
+
+That's where the idea started.
+
+Not a chatbot for the sake of it. A lightweight assistant that knows me — and can represent me when I'm not around.
+
+---
+
+## Architecture Decision: RAG vs. Long Context
+
+My first instinct was to do this "properly."
+
+Chunk my knowledge base. Embed everything. Store vectors in a database. Query at runtime. Classic RAG. I even built it — `chunks.json`, 29 chunks, embedding scripts, the works.
+
+Then I stopped and asked myself:
+
+> How much do I actually need to say about myself?
+
+The answer: about 3,000 tokens worth. Llama 3.3 70B supports a 128K context window. 3,000 tokens is nothing. For a bounded, static domain like a single person, retrieval was unnecessary complexity.
+
+So I scrapped the vector database entirely and just put everything directly into the system prompt. No Vectorize. No embeddings. No chunking pipeline. Just a well-structured system prompt.
+
+This is the decision I'm most glad I made. The architecture went from a multi-step retrieval system to a single Worker function. Simpler to build, simpler to maintain, and fast enough for the use case.
+
+---
+
+## Model Selection: Gemma 3 12B vs. Llama 3.3 70B
+
+Cloudflare Workers AI has a solid catalog. I narrowed it down to two candidates:
+
+|           | Gemma 3 12B   | Llama 3.3 70B fp8-fast      |
+| --------- | ------------- | --------------------------- |
+| Languages | 140 languages | Strong multilingual         |
+| Context   | 128K          | 128K                        |
+| Quality   | Good          | Excellent                   |
+| Speed     | Fast          | Fast (speculative decoding) |
+
+On paper, Gemma 3 12B looks appealing — 140 language support, smaller footprint.
+
+But my actual requirement was specific:  
+**Korean, English, and Mandarin Chinese** — and the responses needed to feel natural, not translated.
+
+After testing both side-by-side, Llama 3.3 70B fp8-fast won clearly on Korean fluency and overall response quality. The speculative decoding keeps it fast despite the size.
+
+For a portfolio assistant where quality matters more than cost, it was an easy call.
+
+---
+
+## Cost: Is It Actually Free?
+
+Workers AI pricing is Neuron-based. The free tier gives you **10,000 Neurons per day**.
+
+```plain
+Input:   196 neurons  (7,350 tokens × 26,668 / 1M)
+Output:   41 neurons  (  200 tokens × 204,805 / 1M)
+─────────────────────────────────────────────────
+Total:  ~237 neurons/request → ~42 requests/day on the free tier
+```
+
+For a portfolio site, 42 meaningful AI interactions per day is plenty.
+
+If traffic spikes, Workers Paid is $5/month and charges $0.011 per 1,000 Neurons above the free allocation.  
+For realistic portfolio traffic, that's probably a few dollars a month at most.
+
+---
+
+## Implementation: Workers + SSE Streaming
+
+SSE (Server-Sent Events) keeps a single HTTP connection open and streams data in chunks as it becomes available — which is how the response appears token by token instead of arriving all at once.
+
+I started with Cloudflare Pages Functions (`functions/api/ask.ts`). It compiled cleanly, the build log said `✨ Compiled Worker successfully`, and everything looked right.
+
+Then every request to `/api/ask` came back 404.
+
+Turns out I already had a separate `golee-api` Worker handling `/api/analytics` and `/api/guestbook` — and it was intercepting all `golee.me/api/*` traffic. Any unrecognized route fell through to `return new Response('Not Found', { status: 404 })`.
+
+Pages Functions never got a chance to run.
+
+So I moved `handleAsk` into the existing Worker instead:
+
+```ts
+if (url.pathname === '/api/ask') {
+  return handleAsk(request, env, corsHeaders);
+}
+```
+
+The handler itself is straightforward — parse the body, pass history + question to Workers AI, stream the response back:
+
+```ts
+async function handleAsk(request, env, corsHeaders) {
+  const { question, history } = await request.json();
+
+  const aiResponse = await env.AI.run(
+    '@cf/meta/llama-3.3-70b-instruct-fp8-fast',
+    {
+      stream: true,
+      max_tokens: 512,
+      messages: [
+        { role: 'system', content: GO_LEE_CONTEXT },
+        ...history.slice(-20),
+        { role: 'user', content: question },
+      ],
+    },
+  );
+
+  return new Response(aiResponse, {
+    headers: { 'Content-Type': 'text/event-stream', ...corsHeaders },
+  });
+}
+```
+
+One thing worth noting: the SSE format from Workers AI differs from the Claude API.
+
+Claude returns:
+
+```json
+{
+  "type": "content_block_delta",
+  "delta": { "type": "text_delta", "text": "..." }
+}
+```
+
+Workers AI returns:
+
+```json
+{ "response": "..." }
+```
+
+This subtle difference caused more debugging time than expected. If you're switching between providers, this is the thing that will catch you. The frontend handles both as a fallback:
+
+```ts
+if (typeof parsed.response === 'string') {
+  accumulated += parsed.response; // Workers AI
+}
+if (parsed.type === 'content_block_delta') {
+  accumulated += parsed.delta.text; // Claude fallback
+}
+```
+
+Each request also sends the full conversation history so the model can follow along:
+
+```ts
+body: JSON.stringify({
+  question: resolved,
+  history: messages
+    .filter((m) => !m.streaming && m.content)
+    .map((m) => ({ role: m.role, content: m.content })),
+}),
+```
+
+The Worker keeps the last 20 turns. In practice most sessions are 2–3 questions, so the free tier holds up fine.
+
+---
+
+## System Prompt Design
+
+The system prompt carries most of the weight. Here's the core instruction:
+
+```plain
+You are an AI assistant on Go Lee's portfolio website (golee.me).
+Answer questions about Go Lee using ONLY the context below.
+Be warm, concise, and conversational — like a knowledgeable friend, not a resume.
+Respond in the SAME language the user writes in (Korean, English, or Chinese).
+```
+
+Language handling is done entirely via instruction — no client-side detection, no extra code. The model just mirrors whatever the user writes in, and it works reliably across Korean, English, and Chinese.
+
+For off-topic questions, I wanted personality over a generic refusal. So instead of "I can only answer questions about Go Lee," the assistant responds with something like:
+
+> "Hmm, I'm only here to talk about Go Lee! Not here to get to know her? Bold move. 👀"
+
+The knowledge base also goes beyond career history — it includes things like taking a bamboo raft on the Amnok River and seeing North Korea, watching Friends 20+ times (Monica fan, firmly not Ross), and running annual solo horror marathons. That's what makes it feel like it actually knows the person, not just a LinkedIn profile.
+
+The assistant is live on this site — `Cmd+K` or the Ask button in the top right. Go ahead and try it.
+
+Just don't say you like Ross.
+
+---
+
+## References
+
+- [Cloudflare Workers AI](https://developers.cloudflare.com/workers-ai/)
+- [Workers AI Model Catalog](https://developers.cloudflare.com/workers-ai/models/)
+- [Cloudflare Pages Functions](https://developers.cloudflare.com/pages/functions/)
+- [Workers AI Pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/)

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useResponsive } from '../../hooks/useResponsive';
 
 const SUGGESTIONS = [
   { emoji: '🛠️', text: "What's her tech stack?" },
@@ -73,6 +74,8 @@ export const SpotlightSearch = ({ onClose }: SpotlightSearchProps) => {
   const [query, setQuery] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const { isMobile } = useResponsive();
+
   const inputRef = useRef<HTMLInputElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -138,7 +141,7 @@ export const SpotlightSearch = ({ onClose }: SpotlightSearchProps) => {
           ...prev.slice(0, -1),
           {
             role: 'assistant',
-            content: 'Something went wrong. Please try again.',
+            content: 'Something went wrong. Please try again. ',
           },
         ]);
         return;
@@ -229,22 +232,24 @@ export const SpotlightSearch = ({ onClose }: SpotlightSearchProps) => {
       <div
         className="spotlight-panel fixed left-1/2 -translate-x-1/2 z-[99999] flex flex-col overflow-hidden"
         style={{
-          top: '64px',
+          top: isMobile ? '56px' : '64px',
           width: 'min(680px, calc(100vw - 32px))',
-          maxHeight: 'calc(100vh - 104px)',
+          maxHeight: isMobile ? 'calc(100dvh - 140px)' : 'calc(100dvh - 120px)',
           borderRadius: '18px',
           background: 'rgba(235, 235, 240, 0.85)',
           backdropFilter: 'blur(40px) saturate(200%)',
           WebkitBackdropFilter: 'blur(40px) saturate(200%)',
           boxShadow:
             '0 40px 80px rgba(0,0,0,0.3), 0 0 0 0.5px rgba(255,255,255,0.5) inset',
+          // helps avoid “touching” Safari bottom bar visually
+          paddingBottom: 'calc(env(safe-area-inset-bottom) + 8px)',
         }}
       >
         {/* Search input row — macOS Spotlight feel */}
         <div
           className="flex items-center gap-3 px-5 shrink-0"
           style={{
-            height: '64px',
+            height: isMobile ? '56px' : '64px',
             borderBottom: hasMessages ? '1px solid rgba(0,0,0,0.1)' : undefined,
           }}
         >
@@ -283,7 +288,7 @@ export const SpotlightSearch = ({ onClose }: SpotlightSearchProps) => {
             }
             className="flex-1 bg-transparent outline-none"
             style={{
-              fontSize: '20px',
+              fontSize: isMobile ? '18px' : '20px',
               fontWeight: 300,
               color: 'rgba(0,0,0,0.85)',
               letterSpacing: '-0.01em',
@@ -301,31 +306,37 @@ export const SpotlightSearch = ({ onClose }: SpotlightSearchProps) => {
                   color: 'rgba(0,0,0,0.3)',
                   background: 'rgba(0,0,0,0.08)',
                   borderRadius: '6px',
-                  padding: '3px 7px',
+                  padding: isMobile ? '6px 8px' : '3px 7px',
                   cursor: 'pointer',
                   minHeight: 'unset',
                   minWidth: 'unset',
                   border: 'none',
                   fontFamily: 'monospace',
                 }}
+                aria-label="Back"
               >
-                ← back
+                {isMobile ? '←' : '← back'}
               </button>
             )}
-            <kbd
-              style={{
-                fontSize: '11px',
-                color: 'rgba(0,0,0,0.3)',
-                background: 'rgba(0,0,0,0.08)',
-                borderRadius: '6px',
-                padding: '3px 7px',
-                cursor: 'pointer',
-                fontFamily: 'monospace',
-              }}
-              onClick={onClose}
-            >
-              esc
-            </kbd>
+
+            {!isMobile && (
+              <kbd
+                style={{
+                  fontSize: '11px',
+                  color: 'rgba(0,0,0,0.3)',
+                  background: 'rgba(0,0,0,0.08)',
+                  borderRadius: '6px',
+                  padding: '3px 7px',
+                  cursor: 'pointer',
+                  fontFamily: 'monospace',
+                }}
+                onClick={onClose}
+                role="button"
+                tabIndex={0}
+              >
+                esc
+              </kbd>
+            )}
           </div>
         </div>
 
@@ -446,8 +457,12 @@ export const SpotlightSearch = ({ onClose }: SpotlightSearchProps) => {
 
         {/* Footer */}
         <div
-          className="flex items-center justify-between px-5 py-2.5 shrink-0"
-          style={{ borderTop: '1px solid rgba(0,0,0,0.08)' }}
+          className="flex items-center justify-between px-5 shrink-0"
+          style={{
+            borderTop: '1px solid rgba(0,0,0,0.08)',
+            paddingTop: '10px',
+            paddingBottom: `calc(10px + env(safe-area-inset-bottom))`,
+          }}
         >
           <span
             style={{

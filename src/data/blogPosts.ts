@@ -2,6 +2,15 @@ import type { BlogPost } from '../types';
 
 export const blogPosts: BlogPost[] = [
   {
+    slug: 'portfolio-that-talks-back',
+    title: 'A Portfolio That Talks Back — Powered by Cloudflare Workers AI',
+    date: '2026-02-28',
+    description:
+      'How I turned my portfolio into an AI assistant using Cloudflare Workers AI, Llama 3.3 70B, and a deliberately simple architecture.',
+    thumbnailUrl: '/thumbnails/portfolio-that-talks-back.gif',
+    readTime: '12 min read',
+  },
+  {
     slug: 'building-personal-ai-agent-with-moltworker',
     title: 'Building a Personal AI Agent with Moltworker',
     date: '2026-02-02',

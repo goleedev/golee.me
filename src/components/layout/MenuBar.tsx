@@ -46,7 +46,7 @@ const MenuBar = ({ currentTime, onLogoClick, onAskClick }: MenuBarProps) => {
       </button>
 
       {/* Right side */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-1 sm:gap-3">
         {/* Ask button */}
         <button
           onClick={onAskClick}
@@ -54,7 +54,9 @@ const MenuBar = ({ currentTime, onLogoClick, onAskClick }: MenuBarProps) => {
           style={{ minHeight: 'unset', minWidth: 'unset' }}
           aria-label="Ask AI about Go"
         >
-          <span className="text-xs leading-none opacity-60">✦</span>
+          <span className="text-base sm:text-xs leading-none opacity-60">
+            ✦
+          </span>
           <span>Ask</span>
         </button>
 
