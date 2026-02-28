@@ -98,7 +98,7 @@ export const SpotlightSearch = ({ onClose }: SpotlightSearchProps) => {
   }, [messages]);
 
   const FUN_FACTS = [
-    'Tell me about the time Go took a bamboo raft on the Amnok River and saw North Korea.',
+    'Tell me about the time Go took a boat on the Tuman River and saw North Korea.',
     "Tell me about Go's obsession with Friends and her favorite character.",
     "Tell me about Go's favorite thriller and horror movies.",
   ];
