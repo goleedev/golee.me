@@ -2,10 +2,9 @@
 
 ![Total Clones](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/goleedev/33e50811ac0dfb7f9b4c6ba6abaa79a6/raw/clone-stats.json?v=2)
 ![GitHub stars](https://img.shields.io/github/stars/goleedev/golee.me?style=flat-square)
-
 ![Total Views](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/goleedev/33e50811ac0dfb7f9b4c6ba6abaa79a6/raw/view-stats.json)
 
-A macOS-inspired portfolio website built with React, TypeScript, and Cloudflare Stack (Pages, Workers, and D1). Features a desktop-like interface with draggable windows, a music player, analytics, and more.
+A macOS-inspired portfolio website built with React, TypeScript, and Cloudflare Stack (Pages, Workers, and D1). Features a desktop-like interface with draggable windows, an AI assistant, analytics, and more.
 
 ![BagelOS Portfolio](public/opengraph-image.png)
 
@@ -30,6 +29,14 @@ A macOS-inspired portfolio website built with React, TypeScript, and Cloudflare 
 - **Guestbook**: Interactive visitor comments with spam protection
 - **Music**: YouTube-integrated music player
 
+### 🤖 AI Assistant
+
+- **Spotlight-style UI**: `Cmd+K` or the Ask button in the menu bar
+- **Powered by Workers AI**: Llama 3.3 70B fp8-fast running on Cloudflare's edge
+- **Multi-turn conversation**: Maintains context across up to 20 turns
+- **Multilingual**: Responds in Korean, English, or Chinese depending on the question
+- **Long Context architecture**: Full knowledge base in system prompt — no RAG, no vector DB
+
 ### 🔧 Technical Features
 
 - **Analytics**: Privacy-focused visitor tracking with Cloudflare D1
@@ -53,6 +60,7 @@ A macOS-inspired portfolio website built with React, TypeScript, and Cloudflare 
 
 - **Cloudflare Pages** - Static hosting
 - **Cloudflare Workers** - Serverless API functions
+- **Cloudflare Workers AI** - AI assistant (Llama 3.3 70B)
 - **Cloudflare D1** - SQLite database
 - **Wrangler** - Cloudflare CLI tool
 
@@ -77,7 +85,7 @@ A macOS-inspired portfolio website built with React, TypeScript, and Cloudflare 
 This repository is primarily a **personal portfolio**, not a general-purpose template.  
 You are welcome to explore the code, but **do not publish or deploy it as your own portfolio**.
 
-If you’d like to build your own version, please:
+If you'd like to build your own version, please:
 
 - Use it as a reference or starting point
 - Replace all personal data and media
@@ -137,7 +145,7 @@ See the LICENSE file for full details.
 
 For questions about using this codebase or licensing inquiries:
 
-- Email: hey@golee.me
+- Email: [hey@golee.me](mailto:hey@golee.me)
 - Open an issue on GitHub
 
 💬 If this project inspired you or helped you build your own,  
@@ -146,4 +154,3 @@ feel free to leave a note in the [Guestbook](https://golee.me/guestbook) — I�
 ---
 
 Note: This is a personal portfolio. While the code is open source, please respect the author's personal content and provide proper attribution when using this codebase.
-Retry
